@@ -1,11 +1,22 @@
 package util.images
 
+import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
 
-class Image(path: String) {
+class ImageWrapper(path: String) {
 
-	private val image = ImageIO.read(new File(path))
+	private val image: BufferedImage = {
+		val image = ImageIO.read(new File(path))
+
+		val greyImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_BYTE_GRAY)
+		val g = greyImage.createGraphics()
+		g.drawImage(image, 0, 0, null)
+		g.dispose()
+
+		greyImage
+	}
+
 	private val pixels = image.getData.getPixels(0, 0, image.getWidth, image.getHeight, null: Array[Int])
 
 	val width = image.getWidth
