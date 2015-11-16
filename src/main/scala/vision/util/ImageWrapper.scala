@@ -50,7 +50,7 @@ class ImageWrapper extends Cloneable with Logging {
 
 		this.normalise()
 	}
-	
+
 	def getPixel(x: Int, y: Int, default: Int): Int = pixels.get(x, y, default)
 
 	def getPixel(x: Int, y: Int): Int = pixels.get(x, y)

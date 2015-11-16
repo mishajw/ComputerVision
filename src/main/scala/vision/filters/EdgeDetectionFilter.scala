@@ -7,7 +7,10 @@ import vision.util.{Matrix, ImageWrapper}
 class EdgeDetectionFilter(xMask: Mask, yMask: Mask) extends Filter with Logging {
 
 	override def convolute(image: ImageWrapper): ImageWrapper = {
-		convoluteSingle(image, xMask)
+		val convX = convoluteSingle(image, xMask)
+		val convY = convoluteSingle(image, xMask)
+
+		combine(convX, convY)
 	}
 
 	private def convoluteSingle(image: ImageWrapper, mask: Mask): ImageWrapper = {
@@ -28,13 +31,26 @@ class EdgeDetectionFilter(xMask: Mask, yMask: Mask) extends Filter with Logging 
 				total += v
 			}
 
-//			info(total)
+			//			info(total)
 			newImage.setPixel(x, y, total.asInstanceOf[Int])
-
 		}
 
 		newImage
 	}
 
 	override def toString: String = "X: " + xMask + "\nY: " + yMask
+
+	def combine(convX: ImageWrapper, convY: ImageWrapper): ImageWrapper = {
+		val combined = convX.clone().asInstanceOf[ImageWrapper]
+
+		for (x <- 0 until combined.width; y <- 0 until combined.height) {
+			combined.setPixel(x, y, (
+				Math.abs(convX.getPixel(x, y)) +
+				Math.abs(convY.getPixel(x, y))
+				) / 2
+			)
+		}
+
+		combined
+	}
 }
