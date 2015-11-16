@@ -3,6 +3,7 @@ package vision.util
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.File
+import java.net.URL
 import java.util
 import javax.imageio.ImageIO
 import javax.swing.{ImageIcon, JLabel, JOptionPane}
@@ -19,19 +20,29 @@ class ImageWrapper extends Cloneable with Logging {
 
 	def height = pixels.height
 
-	def this(filePath: String) {
+	def this(path: String, isUrl: Boolean) {
 		this()
 
-		val file = new File(filePath)
+		var rgbImage: BufferedImage = null
 
-		// validation
-		if (!file.exists()) {
-			Console.err.println("Input file does not exist")
-			sys.exit(1)
+		if (!isUrl) {
+
+			val file = new File(path)
+
+			// validation
+			if (!file.exists()) {
+				Console.err.println("Input file does not exist")
+				sys.exit(1)
+			}
+
+			rgbImage = ImageIO.read(file)
+		}
+		else {
+			rgbImage = ImageIO.read(new URL(path))
 		}
 
-		val rgbImage: BufferedImage = ImageIO.read(file)
-		info(s"Loaded ${file.getName}")
+
+		info(s"Loaded $path")
 
 		val greyImage = new BufferedImage(rgbImage.getWidth, rgbImage.getHeight, BufferedImage.TYPE_BYTE_GRAY)
 		greyImage.getGraphics.drawImage(rgbImage, 0, 0, null)
@@ -77,12 +88,12 @@ class ImageWrapper extends Cloneable with Logging {
 	}
 
 	def applyThreshold(threshold: Int) = {
-		if (threshold <0 || threshold > 255)
+		if (threshold < 0 || threshold > 255)
 			throw new IllegalArgumentException("Invalid threshold")
 
 		debug(s"Applying threshold of $threshold")
 		pixels = new Matrix[Int](pixels.array map (x => if (x >= threshold) 255 else 0), width, height)
 	}
 
-	def flip() = pixels = new Matrix[Int](pixels.array map (x => 255-x), width, height)
+	def flip() = pixels = new Matrix[Int](pixels.array map (x => 255 - x), width, height)
 }

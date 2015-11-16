@@ -9,7 +9,7 @@ object ComputerVisionMain extends Logging {
 	def main(args: Array[String]): Unit = {
 		info("Starting...")
 
-		var image = new ImageWrapper("src/main/resources/images/orig/9343 AM.bmp")
+		var image = new ImageWrapper("src/main/resources/images/orig/9343 AM.bmp", false)
 		image.applyThreshold(10)
 		image = FilterFactory.getFilter(FilterGaussian).convolute(image)
 		image = FilterFactory.getFilter(FilterSobel).convolute(image)
