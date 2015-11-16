@@ -9,7 +9,5 @@ object RGBToGray {
 
 			gray = gray :+ (r + g + b + a) / 4
 		}
-
-
 	}
 }
