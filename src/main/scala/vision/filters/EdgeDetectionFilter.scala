@@ -12,7 +12,7 @@ class EdgeDetectionFilter(xMask: Mask, yMask: Mask) extends Filter with Logging 
 		val convY = convoluteSingle(image, xMask)
 		debug("Convoluted in Y direction")
 
-		combine(convX, convY)
+		combineFast(convX, convY)
 	}
 
 	private def convoluteSingle(image: ImageWrapper, mask: Mask): ImageWrapper = {
@@ -41,7 +41,7 @@ class EdgeDetectionFilter(xMask: Mask, yMask: Mask) extends Filter with Logging 
 
 	override def toString: String = "X: " + xMask + "\nY: " + yMask
 
-	def combine(convX: ImageWrapper, convY: ImageWrapper): ImageWrapper = {
+	def combineFast(convX: ImageWrapper, convY: ImageWrapper): ImageWrapper = {
 		val combined = convX.clone().asInstanceOf[ImageWrapper]
 
 		for (x <- 0 until combined.width; y <- 0 until combined.height) {
@@ -49,6 +49,20 @@ class EdgeDetectionFilter(xMask: Mask, yMask: Mask) extends Filter with Logging 
 				Math.abs(convX.getPixel(x, y)) +
 				Math.abs(convY.getPixel(x, y))
 				) / 2
+			)
+		}
+
+		combined
+	}
+
+	def combineSlow(convX: ImageWrapper, convY: ImageWrapper): ImageWrapper = {
+		val combined = convX.clone().asInstanceOf[ImageWrapper]
+
+		for (x <- 0 until combined.width; y <- 0 until combined.height) {
+			combined.setPixel(x, y, Math.sqrt(
+				Math.pow(convX.getPixel(x, y), 2) +
+				Math.pow(convY.getPixel(x, y), 2)
+			).toInt
 			)
 		}
 
