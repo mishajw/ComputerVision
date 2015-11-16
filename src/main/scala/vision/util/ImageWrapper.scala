@@ -7,7 +7,11 @@ import java.util
 import javax.imageio.ImageIO
 import javax.swing.{ImageIcon, JLabel, JOptionPane}
 
-class ImageWrapper extends Cloneable {
+import grizzled.slf4j.Logging
+
+import scala.collection.mutable.ArrayBuffer
+
+class ImageWrapper extends Cloneable with Logging {
 
 	private var pixels: Matrix[Int] = _
 
@@ -42,10 +46,11 @@ class ImageWrapper extends Cloneable {
 			newArray = newArray :+ grey
 		}
 
-		pixels = new Matrix[Int](newArray, image.getWidth(), image.getHeight())
+		pixels = new Matrix[Int](newArray, image.getWidth, image.getHeight)
+
+		this.normalise()
 	}
-
-
+	
 	def getPixel(x: Int, y: Int, default: Int): Int = pixels.get(x, y, default)
 
 	def getPixel(x: Int, y: Int): Int = pixels.get(x, y)
@@ -54,10 +59,19 @@ class ImageWrapper extends Cloneable {
 
 	def createImage() = {
 		val image = new BufferedImage(width, height, BufferedImage.TYPE_USHORT_GRAY)
-		image.getRaster.setPixels(0, 0, width, height, pixels.array.toArray)
+//		image.getRaster.setPixels(0, 0, width, height, pixels.array.toArray)
+
+		val g = image.getGraphics
+
+		for (x <- 0 until width; y <- 0 until height) {
+			val pixel: Int = pixels.get(x, y)
+			g.setColor(new Color(pixel, pixel, pixel))
+			g.drawRect(x, y, 1, 1)
+		}
+
+		ImageIO.write(image, "png", new File("output_image.png"))
 		image
 	}
-
 
 	def display() = JOptionPane.showMessageDialog(null, new JLabel(new ImageIcon(createImage())))
 
@@ -65,5 +79,18 @@ class ImageWrapper extends Cloneable {
 		val newImage = new ImageWrapper
 		newImage.pixels = pixels.clone().asInstanceOf[Matrix[Int]]
 		newImage
+	}
+
+	def normalise(): Unit = {
+		val max: Double = pixels.array.max
+		val min: Double = pixels.array.min
+
+		info(s"$max, $min")
+
+		val normalisedArray: ArrayBuffer[Int] = pixels.array.map(pixel => {
+			(((pixel.toDouble - min) / (max - min)) * 255d).toInt
+		})
+
+		pixels = new Matrix[Int](normalisedArray, width, height)
 	}
 }
