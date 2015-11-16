@@ -12,8 +12,8 @@ class Image(path: String) {
 	val height = image.getHeight
 
 	/**
-	  * @return (r, g, b, a)
-	  */
+	 * @return (r, g, b, a)
+	 */
 	def getPixel(x: Int, y: Int): (Int, Int, Int, Int) = {
 		val rgb = image.getColorModel.getRGB(pixels(width * x + y))
 
