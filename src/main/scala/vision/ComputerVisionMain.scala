@@ -15,5 +15,7 @@ object ComputerVisionMain extends Logging {
 		val convolved = filter.convolute(image)
 		convolved.normalise()
 		convolved.display()
+
+		info(filter)
 	}
 }
