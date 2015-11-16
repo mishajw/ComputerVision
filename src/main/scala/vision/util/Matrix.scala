@@ -49,4 +49,6 @@ class Matrix[T](array: ArrayBuffer[T], matrixWidth: Int, matrixHeight: Int) {
 
 		new Matrix[T](newArray, _width, _height)
 	}
+
+	override def toString: String = array.toString
 }

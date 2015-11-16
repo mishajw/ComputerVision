@@ -13,5 +13,7 @@ object ComputerVisionMain extends Logging {
 
 		val filter = FilterFactory.getFilter(Sobel())
 		filter.convolute(image).display()
+
+		info(filter)
 	}
 }

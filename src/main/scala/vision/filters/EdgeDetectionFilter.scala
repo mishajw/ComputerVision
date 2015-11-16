@@ -28,5 +28,5 @@ class EdgeDetectionFilter(xMask: Mask, yMask: Mask) extends Filter {
 		newImage
 	}
 
-
+	override def toString: String = "X: " + xMask + "\nY: " + yMask
 }
