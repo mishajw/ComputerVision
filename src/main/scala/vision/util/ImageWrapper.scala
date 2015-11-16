@@ -3,48 +3,46 @@ package vision.util
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.File
+import java.util
 import javax.imageio.ImageIO
 import javax.swing.{ImageIcon, JLabel, JOptionPane}
 
 class ImageWrapper extends Cloneable {
 
-	private var image: BufferedImage = _
 	private var pixels: Matrix[Int] = _
 
-	private var _width: Int = _
-	private var _height: Int = _
+	def width = pixels.width
 
-	def width = _width
-
-	def height = _height
+	def height = pixels.height
 
 	def this(filePath: String) {
 		this()
 
-		image = {
-			val file = new File(filePath)
+		val file = new File(filePath)
 
-			// validation
-			if (!file.exists()) {
-				Console.err.println("Input file does not exist")
-				sys.exit(1)
-			}
-
-			val image = ImageIO.read(file)
-
-			val greyImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_BYTE_GRAY)
-			val g = greyImage.createGraphics()
-			g.drawImage(image, 0, 0, null)
-			g.dispose()
-
-			greyImage
+		// validation
+		if (!file.exists()) {
+			Console.err.println("Input file does not exist")
+			sys.exit(1)
 		}
 
-		pixels = new Matrix(image.getData.getPixels(0, 0, image.getWidth, image.getHeight, null: Array[Int]),
-			image.getWidth, image.getHeight)
+		val image: BufferedImage = ImageIO.read(file)
 
-		_width = image.getWidth
-		_height = image.getHeight
+		val imagePixels: Array[Int] = image.getData.getPixels(0, 0, image.getWidth, image.getHeight, null: Array[Int])
+
+		pixels = new Matrix(imagePixels,image.getWidth, image.getHeight)
+
+		var newArray: Array[Int] = Array()
+		for (x <- 0 until image.getWidth; y <- 0 until image.getHeight) {
+			val pixel: Array[Int] = image.getData.getPixel(y, x, null)
+			//			val pixel = new Color(pixels.get(x,y))
+			//			val rgb = Array(pixel.getRed, pixel.getGreen, pixel.getBlue)
+
+			val grey = pixel.sum / pixel.length
+			newArray = newArray :+ grey
+		}
+
+		pixels = new Matrix[Int](newArray, image.getWidth(), image.getHeight())
 	}
 
 
@@ -52,26 +50,20 @@ class ImageWrapper extends Cloneable {
 
 	def getPixel(x: Int, y: Int): Int = pixels.get(x, y)
 
-	def setPixel(x:Int, y:Int, value:Int) = {
-		pixels.set(x,y,value)
-		image.setRGB(x,y,new Color(value,value,value).getRGB)
+	def setPixel(x: Int, y: Int, value: Int) = pixels.set(x, y, value)
+
+	def createImage() = {
+		val image = new BufferedImage(width, height, BufferedImage.TYPE_USHORT_GRAY)
+		image.getRaster.setPixels(0, 0, width, height, pixels.array.toArray)
+		image
 	}
 
-	def display() = JOptionPane.showMessageDialog(null, new JLabel(new ImageIcon(image)))
+
+	def display() = JOptionPane.showMessageDialog(null, new JLabel(new ImageIcon(createImage())))
 
 	override def clone(): AnyRef = {
 		val newImage = new ImageWrapper
-
-		newImage._width = _width
-		newImage._height = _height
 		newImage.pixels = pixels.clone().asInstanceOf[Matrix[Int]]
-
-		val b = new BufferedImage(_width, _height, image.getType)
-		val g = b.getGraphics
-		g.drawImage(b, 0,0,null)
-		g.dispose()
-
-		newImage.image = b
 		newImage
 	}
 }

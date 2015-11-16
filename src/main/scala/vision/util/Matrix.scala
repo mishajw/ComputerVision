@@ -2,10 +2,14 @@ package vision.util
 
 import scala.collection.mutable.ArrayBuffer
 
-class Matrix[T](array: ArrayBuffer[T], matrixWidth: Int, matrixHeight: Int) {
+class Matrix[T](matrixArray: ArrayBuffer[T], matrixWidth: Int, matrixHeight: Int) {
 	private var _width = matrixWidth
 
 	private var _height = matrixHeight
+
+	private val _array = matrixArray
+
+	def array = _array
 
 	def this(array: ArrayBuffer[T]) {
 		this(array, 0, 0)
@@ -39,16 +43,16 @@ class Matrix[T](array: ArrayBuffer[T], matrixWidth: Int, matrixHeight: Int) {
 		get(x, y)
 	}
 
-	def get(x: Int, y: Int) = array(_width * y + x)
+	def get(x: Int, y: Int) = matrixArray(_width * y + x)
 
-	def set(x: Int, y: Int, value: T) = array(_width * y + x) = value
+	def set(x: Int, y: Int, value: T) = matrixArray(_width * y + x) = value
 
 	override def clone(): AnyRef = {
-		val newArray = new ArrayBuffer[T](array.length)
-		array.copyToBuffer(newArray)
+		val newArray = new ArrayBuffer[T](matrixArray.length)
+		matrixArray.copyToBuffer(newArray)
 
 		new Matrix[T](newArray, _width, _height)
 	}
 
-	override def toString: String = array.toString
+	override def toString: String = matrixArray.toString
 }
