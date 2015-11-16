@@ -7,7 +7,15 @@ import javax.imageio.ImageIO
 class ImageWrapper(path: String) {
 
 	private val image: BufferedImage = {
-		val image = ImageIO.read(new File(path))
+		val file = new File(path)
+
+		// validation
+		if (!file.exists()) {
+			Console.err.println("Input file does not exist")
+			sys.exit(1)
+		}
+
+		val image = ImageIO.read(file)
 
 		val greyImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_BYTE_GRAY)
 		val g = greyImage.createGraphics()
