@@ -5,9 +5,9 @@ object RGBToGray {
 		var gray: Array[Int] = Array()
 
 		for (x <- 0 to rgb.height; y <- 0 to rgb.width) {
-			val pixel = rgb.getPixel(x, y)
+			val (r, g, b, a) = rgb.getPixel(x, y)
 
-			gray = gray :+ (pixel.sum / pixel.length)
+			gray = gray :+ (r + g + b + a) / 4
 		}
 	}
 }
