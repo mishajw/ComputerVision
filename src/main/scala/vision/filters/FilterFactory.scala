@@ -11,34 +11,37 @@ object FilterFactory extends Logging {
 
 	type Mask = Matrix[Double]
 
-	abstract class FilterType
-	case class Sobel() extends FilterType
-	case class Roberts() extends FilterType
-	case class Gaussian() extends FilterType
+	abstract sealed class FilterType
+
+	case object FilterSobel extends FilterType
+
+	case object FilterRoberts extends FilterType
+
+	case object FilterGaussian extends FilterType
 
 	lazy val json = new JSONObject(Source.fromFile("src/main/resources/json/filters.json").mkString)
 
 	/**
-	 * Get a filter by its type
-	 * @param filterType The type of filter
-	 * @return actual filter object
-	 */
+	  * Get a filter by its type
+	  * @param filterType The type of filter
+	  * @return actual filter object
+	  */
 	def getFilter(filterType: FilterType) = filterType match {
-		case Sobel() => new EdgeDetectionFilter(
+		case FilterSobel => new EdgeDetectionFilter(
 			getArrayByName("sobelX"),
 			getArrayByName("sobelY"))
-		case Roberts() => new EdgeDetectionFilter(
+		case FilterRoberts => new EdgeDetectionFilter(
 			getArrayByName("robertsX"),
 			getArrayByName("robertsY"))
-			case Gaussian() => new SimpleFilter(
-				getArrayByName("gaussian"))
+		case FilterGaussian => new SimpleFilter(
+			getArrayByName("gaussian"))
 	}
 
 	/**
-	 * Get an array by it's string name
-	 * @param s name
-	 * @return Mask from JSON
-	 */
+	  * Get an array by it's string name
+	  * @param s name
+	  * @return Mask from JSON
+	  */
 	def getArrayByName(s: String): Mask = {
 		var filter: ArrayBuffer[Double] = new ArrayBuffer[Double]()
 		var width = 0
