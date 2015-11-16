@@ -1,6 +1,6 @@
-package util.filters
+package vision.filters
 
-import util.images.ImageWrapper
+import vision.util.ImageWrapper
 
 abstract class Filter {
 	def convolute(image: ImageWrapper): ImageWrapper

@@ -1,11 +1,9 @@
-package util.images
+package vision.util
 
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
 import javax.swing.{ImageIcon, JLabel, JOptionPane}
-
-import util.Matrix
 
 class ImageWrapper(path: String) {
 
@@ -28,8 +26,8 @@ class ImageWrapper(path: String) {
 		greyImage
 	}
 
-	private val pixels = new Matrix(image.getWidth, image.getHeight,
-		image.getData.getPixels(0, 0, image.getWidth, image.getHeight, null: Array[Int]))
+	private val pixels = new Matrix(image.getData.getPixels(0, 0, image.getWidth, image.getHeight, null: Array[Int]),
+		image.getWidth, image.getHeight)
 
 	val width = pixels.width
 	val height = pixels.height

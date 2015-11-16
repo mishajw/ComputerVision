@@ -1,14 +1,19 @@
-package util.filters
+package vision.filters
 
 import grizzled.slf4j.Logging
 import org.json.JSONObject
-import util.Matrix
+import vision.util.Matrix
 
 import scala.io.Source
 
-object FilterFactory extends Logging{
+object FilterFactory extends Logging {
+
+	type Mask = Matrix[Double]
+
 	abstract class FilterType
+
 	case class Sobel() extends FilterType
+
 	case class Roberts() extends FilterType
 
 	lazy val json = new JSONObject(Source.fromFile("src/main/resources/json/filters.json").mkString)
@@ -22,23 +27,23 @@ object FilterFactory extends Logging{
 			getArrayByName("robertsY"))
 	}
 
-	def getArrayByName(s: String): Matrix = {
+	def getArrayByName(s: String): Mask = {
 		var filter: Array[Double] = Array()
-		var width: Int = _
-		var height: Int = _
+		var width = 0
+		var height = 0
 
 		val jsonMatrix = json.getJSONArray(s)
 		width = jsonMatrix.length()
 
 		for (i <- 0 until width) {
 			val jsonRow = jsonMatrix.getJSONArray(i)
-			height=  jsonRow.length()
+			height = jsonRow.length()
 
 			for (j <- 0 until height) {
-				filter = filter :+ jsonRow.getInt(j)
+				filter = filter :+ jsonRow.getDouble(j)
 			}
 		}
 
-		new Matrix(width, height, filter)
+		new Mask(filter, width, height)
 	}
 }
