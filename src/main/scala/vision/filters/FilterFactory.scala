@@ -18,9 +18,9 @@ object FilterFactory extends Logging {
 	lazy val json = new JSONObject(Source.fromFile("src/main/resources/json/filters.json").mkString)
 
 	/**
-	 * Get a filter by it's type
-	 * @param filterType
-	 * @return
+	 * Get a filter by its type
+	 * @param filterType The type of filter
+	 * @return actual filter object
 	 */
 	def getFilter(filterType: FilterType) = filterType match {
 		case Sobel() => new EdgeDetectionFilter(
