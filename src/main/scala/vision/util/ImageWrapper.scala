@@ -30,23 +30,12 @@ class ImageWrapper extends Cloneable with Logging {
 			sys.exit(1)
 		}
 
-		val image: BufferedImage = ImageIO.read(file)
+		val rgbImage: BufferedImage = ImageIO.read(file)
+		val greyImage = new BufferedImage(rgbImage.getWidth, rgbImage.getHeight, BufferedImage.TYPE_BYTE_GRAY)
+		greyImage.getGraphics.drawImage(rgbImage, 0, 0, null)
 
-		val imagePixels: Array[Int] = image.getData.getPixels(0, 0, image.getWidth, image.getHeight, null: Array[Int])
-
-		pixels = new Matrix(imagePixels,image.getWidth, image.getHeight)
-
-		var newArray: Array[Int] = Array()
-		for (x <- 0 until image.getWidth; y <- 0 until image.getHeight) {
-			val pixel: Array[Int] = image.getData.getPixel(y, x, null)
-			//			val pixel = new Color(pixels.get(x,y))
-			//			val rgb = Array(pixel.getRed, pixel.getGreen, pixel.getBlue)
-
-			val grey = pixel.sum / pixel.length
-			newArray = newArray :+ grey
-		}
-
-		pixels = new Matrix[Int](newArray, image.getWidth, image.getHeight)
+		val greyPixels = greyImage.getRaster.getPixels(0, 0, greyImage.getWidth, greyImage.getHeight, null: Array[Int])
+		pixels = new Matrix[Int](greyPixels, greyImage.getWidth(), greyImage.getHeight())
 
 		this.normalise()
 	}
@@ -58,18 +47,8 @@ class ImageWrapper extends Cloneable with Logging {
 	def setPixel(x: Int, y: Int, value: Int) = pixels.set(x, y, value)
 
 	def createImage() = {
-		val image = new BufferedImage(width, height, BufferedImage.TYPE_USHORT_GRAY)
-//		image.getRaster.setPixels(0, 0, width, height, pixels.array.toArray)
-
-		val g = image.getGraphics
-
-		for (x <- 0 until width; y <- 0 until height) {
-			val pixel: Int = pixels.get(x, y)
-			g.setColor(new Color(pixel, pixel, pixel))
-			g.drawRect(x, y, 1, 1)
-		}
-
-		ImageIO.write(image, "png", new File("output_image.png"))
+		val image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY)
+		image.getRaster.setPixels(0, 0, width, height, pixels.array.toArray)
 		image
 	}
 
