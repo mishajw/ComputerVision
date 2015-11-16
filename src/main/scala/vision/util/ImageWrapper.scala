@@ -40,8 +40,6 @@ class ImageWrapper extends Cloneable with Logging {
 		pixels = new Matrix[Int](greyPixels, greyImage.getWidth(), greyImage.getHeight())
 
 		debug("Converted image to greyscale")
-		this.normalise()
-		debug("Normalised image")
 	}
 
 	def getPixel(x: Int, y: Int, default: Int): Int = pixels.get(x, y, default)
@@ -69,10 +67,20 @@ class ImageWrapper extends Cloneable with Logging {
 		val max: Double = pixels.array.max
 		val min: Double = pixels.array.min
 
+		debug("Normalising")
+
 		val normalisedArray: ArrayBuffer[Int] = pixels.array.map(pixel => {
 			(((pixel.toDouble - min) / (max - min)) * 255d).toInt
 		})
 
 		pixels = new Matrix[Int](normalisedArray, width, height)
+	}
+
+	def applyThreshold(threshold: Int) = {
+		if (threshold <0 || threshold > 255)
+			throw new IllegalArgumentException("Invalid threshold")
+
+		debug(s"Applying threshold of $threshold")
+		pixels = new Matrix[Int](pixels.array map (x => if (x >= threshold) 255 else 0), width, height)
 	}
 }

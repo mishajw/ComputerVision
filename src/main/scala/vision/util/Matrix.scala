@@ -7,7 +7,7 @@ class Matrix[T](matrixArray: ArrayBuffer[T], matrixWidth: Int, matrixHeight: Int
 
 	private var _height = matrixHeight
 
-	private val _array = matrixArray
+	val _array = matrixArray
 
 	def array = _array
 

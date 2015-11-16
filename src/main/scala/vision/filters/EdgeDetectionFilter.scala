@@ -7,10 +7,11 @@ import vision.util.{Matrix, ImageWrapper}
 class EdgeDetectionFilter(xMask: Mask, yMask: Mask) extends Filter with Logging {
 
 	override def convolute(image: ImageWrapper): ImageWrapper = {
+		debug("Convoluting in X direction")
 		val convX = convoluteSingle(image, xMask)
-		debug("Convoluted in X direction")
+
+		debug("Convoluting in Y direction")
 		val convY = convoluteSingle(image, yMask)
-		debug("Convoluted in Y direction")
 
 		combineFast(convX, convY)
 	}
