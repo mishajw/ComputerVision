@@ -8,7 +8,9 @@ class EdgeDetectionFilter(xMask: Mask, yMask: Mask) extends Filter with Logging 
 
 	override def convolute(image: ImageWrapper): ImageWrapper = {
 		val convX = convoluteSingle(image, xMask)
+		debug("Convoluted in X direction")
 		val convY = convoluteSingle(image, xMask)
+		debug("Convoluted in Y direction")
 
 		combine(convX, convY)
 	}
@@ -31,7 +33,6 @@ class EdgeDetectionFilter(xMask: Mask, yMask: Mask) extends Filter with Logging 
 				total += v
 			}
 
-			//			info(total)
 			newImage.setPixel(x, y, total.asInstanceOf[Int])
 		}
 

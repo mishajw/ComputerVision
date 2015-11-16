@@ -11,11 +11,9 @@ object ComputerVisionMain extends Logging {
 
 		val filter = FilterFactory.getFilter(Sobel())
 
-		val image = new ImageWrapper("src/main/resources/homer.png")
+		val image = new ImageWrapper("src/main/resources/house.jpg")
 		val convolved = filter.convolute(image)
 		convolved.normalise()
 		convolved.display()
-
-		info(filter)
 	}
 }

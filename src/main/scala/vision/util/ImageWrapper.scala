@@ -31,13 +31,17 @@ class ImageWrapper extends Cloneable with Logging {
 		}
 
 		val rgbImage: BufferedImage = ImageIO.read(file)
+		info(s"Loaded ${file.getName}")
+
 		val greyImage = new BufferedImage(rgbImage.getWidth, rgbImage.getHeight, BufferedImage.TYPE_BYTE_GRAY)
 		greyImage.getGraphics.drawImage(rgbImage, 0, 0, null)
 
 		val greyPixels = greyImage.getRaster.getPixels(0, 0, greyImage.getWidth, greyImage.getHeight, null: Array[Int])
 		pixels = new Matrix[Int](greyPixels, greyImage.getWidth(), greyImage.getHeight())
 
+		debug("Converted image to greyscale")
 		this.normalise()
+		debug("Normalised image")
 	}
 
 	def getPixel(x: Int, y: Int, default: Int): Int = pixels.get(x, y, default)
@@ -47,6 +51,7 @@ class ImageWrapper extends Cloneable with Logging {
 	def setPixel(x: Int, y: Int, value: Int) = pixels.set(x, y, value)
 
 	def createImage() = {
+		debug("Creating image to display")
 		val image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY)
 		image.getRaster.setPixels(0, 0, width, height, pixels.array.toArray)
 		image
@@ -63,8 +68,6 @@ class ImageWrapper extends Cloneable with Logging {
 	def normalise(): Unit = {
 		val max: Double = pixels.array.max
 		val min: Double = pixels.array.min
-
-		info(s"$max, $min")
 
 		val normalisedArray: ArrayBuffer[Int] = pixels.array.map(pixel => {
 			(((pixel.toDouble - min) / (max - min)) * 255d).toInt
