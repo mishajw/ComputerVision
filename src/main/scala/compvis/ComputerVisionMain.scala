@@ -8,5 +8,6 @@ object ComputerVisionMain extends Logging {
 		info("Starting...")
 
 		val image = new ImageWrapper("src/main/resources/house.jpg")
+		image.display()
 	}
 }

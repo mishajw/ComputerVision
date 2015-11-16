@@ -8,7 +8,7 @@ object FilterFactory {
 	case class Sobel() extends FilterType
 	case class Roberts() extends FilterType
 
-	lazy val json =
+	lazy val json = ???
 
 	def getFilter(filterType: FilterType) = filterType match {
 		case Sobel() => getFilterByName("sobel")
