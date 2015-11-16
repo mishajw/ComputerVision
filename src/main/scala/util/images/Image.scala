@@ -7,7 +7,7 @@ class Image {
 	val width = 0
 	val height = 0
 
-	def getPixel(x: Int, y: Int): Int = {
+	def getPixel(x: Int, y: Int): Seq[Int] = {
 		0
 	}
 }
