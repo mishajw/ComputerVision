@@ -83,4 +83,6 @@ class ImageWrapper extends Cloneable with Logging {
 		debug(s"Applying threshold of $threshold")
 		pixels = new Matrix[Int](pixels.array map (x => if (x >= threshold) 255 else 0), width, height)
 	}
+
+	def flip() = pixels = new Matrix[Int](pixels.array map (x => 255-x), width, height)
 }

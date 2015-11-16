@@ -10,10 +10,12 @@ object ComputerVisionMain extends Logging {
 		info("Starting...")
 
 		var image = new ImageWrapper("src/main/resources/images/orig/9343 AM.bmp")
+		image.applyThreshold(10)
 		image = FilterFactory.getFilter(FilterGaussian).convolute(image)
 		image = FilterFactory.getFilter(FilterSobel).convolute(image)
 		image.normalise()
-		image.applyThreshold(70)
+		image.applyThreshold(50)
+		image.flip()
 		image.display()
 	}
 }
