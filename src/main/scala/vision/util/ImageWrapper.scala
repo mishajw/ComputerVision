@@ -70,6 +70,8 @@ class ImageWrapper extends Cloneable {
 		val g = b.getGraphics
 		g.drawImage(b, 0,0,null)
 		g.dispose()
-		b
+
+		newImage.image = b
+		newImage
 	}
 }

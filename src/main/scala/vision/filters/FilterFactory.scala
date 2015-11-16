@@ -4,6 +4,7 @@ import grizzled.slf4j.Logging
 import org.json.JSONObject
 import vision.util.Matrix
 
+import scala.collection.mutable.ArrayBuffer
 import scala.io.Source
 
 object FilterFactory extends Logging {
@@ -39,7 +40,7 @@ object FilterFactory extends Logging {
 	 * @return Mask from JSON
 	 */
 	def getArrayByName(s: String): Mask = {
-		var filter: Array[Double] = Array()
+		var filter: ArrayBuffer[Double] = new ArrayBuffer[Double]()
 		var width = 0
 		var height = 0
 
