@@ -1,6 +1,8 @@
 package vision
 
 import grizzled.slf4j.Logging
+import vision.filters.FilterFactory
+import vision.filters.FilterFactory.Sobel
 import vision.util.ImageWrapper
 
 object ComputerVisionMain extends Logging {
@@ -8,6 +10,8 @@ object ComputerVisionMain extends Logging {
 		info("Starting...")
 
 		val image = new ImageWrapper("src/main/resources/house.jpg")
-		image.display()
+
+		val filter = FilterFactory.getFilter(Sobel())
+		filter.convolute(image).display()
 	}
 }
