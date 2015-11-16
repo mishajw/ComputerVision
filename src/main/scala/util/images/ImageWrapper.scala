@@ -3,6 +3,7 @@ package util.images
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
+import javax.swing.{ImageIcon, JLabel, JOptionPane}
 
 class ImageWrapper(path: String) {
 
@@ -30,17 +31,7 @@ class ImageWrapper(path: String) {
 	val width = image.getWidth
 	val height = image.getHeight
 
-	/**
-	 * @return (r, g, b, a)
-	 */
-	def getPixel(x: Int, y: Int): (Int, Int, Int, Int) = {
-		val rgb = image.getColorModel.getRGB(pixels(width * x + y))
+	def getPixel(x: Int, y: Int): Int = image.getColorModel.getRed(pixels(width * x + y))
 
-		val a = (rgb >> 24) & 0xff
-		val r = (rgb >> 16) & 0xff
-		val g = (rgb >> 8) & 0xff
-		val b = rgb & 0xff
-
-		(r, g, b, a)
-	}
+	def display() = JOptionPane.showMessageDialog(null, new JLabel(new ImageIcon(image)))
 }
