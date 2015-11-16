@@ -7,7 +7,11 @@ import java.util
 import javax.imageio.ImageIO
 import javax.swing.{ImageIcon, JLabel, JOptionPane}
 
-class ImageWrapper extends Cloneable {
+import grizzled.slf4j.Logging
+
+import scala.collection.mutable.ArrayBuffer
+
+class ImageWrapper extends Cloneable with Logging {
 
 	private var pixels: Matrix[Int] = _
 
@@ -30,11 +34,11 @@ class ImageWrapper extends Cloneable {
 		val greyImage = new BufferedImage(rgbImage.getWidth, rgbImage.getHeight, BufferedImage.TYPE_BYTE_GRAY)
 		greyImage.getGraphics.drawImage(rgbImage, 0, 0, null)
 
+		val greyPixels = greyImage.getRaster.getPixels(0, 0, greyImage.getWidth, greyImage.getHeight, null: Array[Int])
+		pixels = new Matrix[Int](greyPixels, greyImage.getWidth(), greyImage.getHeight())
 
-		val huePixels = greyImage.getRaster.getPixels(0,0,greyImage.getWidth, greyImage.getHeight, null: Array[Int])
-		pixels = new Matrix[Int](huePixels, greyImage.getWidth(), greyImage.getHeight())
+		this.normalise()
 	}
-
 
 	def getPixel(x: Int, y: Int, default: Int): Int = pixels.get(x, y, default)
 
@@ -48,12 +52,24 @@ class ImageWrapper extends Cloneable {
 		image
 	}
 
-
 	def display() = JOptionPane.showMessageDialog(null, new JLabel(new ImageIcon(createImage())))
 
 	override def clone(): AnyRef = {
 		val newImage = new ImageWrapper
 		newImage.pixels = pixels.clone().asInstanceOf[Matrix[Int]]
 		newImage
+	}
+
+	def normalise(): Unit = {
+		val max: Double = pixels.array.max
+		val min: Double = pixels.array.min
+
+		info(s"$max, $min")
+
+		val normalisedArray: ArrayBuffer[Int] = pixels.array.map(pixel => {
+			(((pixel.toDouble - min) / (max - min)) * 255d).toInt
+		})
+
+		pixels = new Matrix[Int](normalisedArray, width, height)
 	}
 }

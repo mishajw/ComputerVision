@@ -1,9 +1,10 @@
 package vision.filters
 
+import grizzled.slf4j.Logging
 import vision.filters.FilterFactory.Mask
 import vision.util.{Matrix, ImageWrapper}
 
-class EdgeDetectionFilter(xMask: Mask, yMask: Mask) extends Filter {
+class EdgeDetectionFilter(xMask: Mask, yMask: Mask) extends Filter with Logging {
 
 	override def convolute(image: ImageWrapper): ImageWrapper = {
 		convoluteSingle(image, xMask)
@@ -18,10 +19,17 @@ class EdgeDetectionFilter(xMask: Mask, yMask: Mask) extends Filter {
 			var total:Double = 0
 			val size = Math.floor(mask.width / 2).asInstanceOf[Int]
 
-			for (dx <- 0 until mask.width; dy <- 0 until mask.height)
-				total += mask.get(dx, dy) * newImage.getPixel(x + dx - size, y + dy - size, 0)
+			for (dx <- 0 until mask.width; dy <- 0 until mask.height){
+				val nx: Int = x + dx - size
+				val ny: Int = y + dy - size
+				val maskVal: Double = mask.get(dx, dy)
+				val imageVal: Int = image.getPixel(nx, ny, 0)
+				val v: Double = maskVal * imageVal
+				total += v
+			}
 
-			newImage.setPixel(x,y,Math.max(0, Math.min(255, total)).asInstanceOf[Int])
+//			info(total)
+			newImage.setPixel(x, y, total.asInstanceOf[Int])
 
 		}
 

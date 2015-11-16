@@ -49,7 +49,7 @@ class Matrix[T](matrixArray: ArrayBuffer[T], matrixWidth: Int, matrixHeight: Int
 
 	override def clone(): AnyRef = {
 		val newArray = new ArrayBuffer[T](matrixArray.length)
-		matrixArray.copyToBuffer(newArray)
+		array.copyToBuffer(newArray)
 
 		new Matrix[T](newArray, _width, _height)
 	}
