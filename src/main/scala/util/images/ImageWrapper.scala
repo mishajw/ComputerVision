@@ -5,6 +5,8 @@ import java.io.File
 import javax.imageio.ImageIO
 import javax.swing.{ImageIcon, JLabel, JOptionPane}
 
+import util.Matrix
+
 class ImageWrapper(path: String) {
 
 	private val image: BufferedImage = {
@@ -26,12 +28,13 @@ class ImageWrapper(path: String) {
 		greyImage
 	}
 
-	private val pixels = image.getData.getPixels(0, 0, image.getWidth, image.getHeight, null: Array[Int])
+	private val pixels = new Matrix(image.getWidth, image.getHeight,
+		image.getData.getPixels(0, 0, image.getWidth, image.getHeight, null: Array[Int]))
 
-	val width = image.getWidth
-	val height = image.getHeight
+	val width = pixels.width
+	val height = pixels.height
 
-	def getPixel(x: Int, y: Int): Int = image.getColorModel.getRed(pixels(width * x + y))
+	def getPixel(x: Int, y: Int): Int = pixels.get(x, y)
 
 	def display() = JOptionPane.showMessageDialog(null, new JLabel(new ImageIcon(image)))
 }
