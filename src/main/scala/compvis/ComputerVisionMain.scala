@@ -1,10 +1,12 @@
 package compvis
 
-import _root_.util.images.Image
+import _root_.util.images.ImageWrapper
 import grizzled.slf4j.Logging
 
 object ComputerVisionMain extends Logging {
 	def main(args: Array[String]) = {
-		val image = new Image("src/main/resources/red.jpg")
+		info("Starting...")
+
+		val image = new ImageWrapper("src/main/resources/house.jpg")
 	}
 }

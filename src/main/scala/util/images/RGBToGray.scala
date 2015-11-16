@@ -1,7 +1,7 @@
 package util.images
 
 object RGBToGray {
-	def convert(rgb: Image) {
+	def convert(rgb: ImageWrapper) {
 		var gray: Array[Int] = Array()
 
 		for (x <- 0 to rgb.height; y <- 0 to rgb.width) {
