@@ -47,7 +47,7 @@ class Matrix[T](matrixArray: ArrayBuffer[T], matrixWidth: Int, matrixHeight: Int
 
 	def set(x: Int, y: Int, value: T) = matrixArray(_width * y + x) = value
 
-	override def clone(): AnyRef = {
+	override def clone: Matrix[T] = {
 		val newArray = new ArrayBuffer[T](matrixArray.length)
 		array.copyToBuffer(newArray)
 

@@ -1,5 +1,6 @@
 package vision.filters
 
+//import breeze.stats.distributions.Gaussian
 import grizzled.slf4j.Logging
 import org.json.JSONObject
 import vision.util.Matrix
@@ -22,10 +23,10 @@ object FilterFactory extends Logging {
 	lazy val json = new JSONObject(Source.fromFile("src/main/resources/json/filters.json").mkString)
 
 	/**
-	  * Get a filter by its type
-	  * @param filterType The type of filter
-	  * @return actual filter object
-	  */
+		* Get a filter by its type
+		* @param filterType The type of filter
+		* @return actual filter object
+		*/
 	def getFilter(filterType: FilterType) = filterType match {
 		case FilterSobel => new EdgeDetectionFilter(
 			getArrayByName("sobelX"),
@@ -34,14 +35,14 @@ object FilterFactory extends Logging {
 			getArrayByName("robertsX"),
 			getArrayByName("robertsY"))
 		case FilterGaussian => new SimpleFilter(
-			getArrayByName("gaussian"))
+			/*getArrayByName("gaussian")*/getGaussianImage)
 	}
 
 	/**
-	  * Get an array by it's string name
-	  * @param s name
-	  * @return Mask from JSON
-	  */
+		* Get an array by it's string name
+		* @param s name
+		* @return Mask from JSON
+		*/
 	def getArrayByName(s: String): Mask = {
 		var filter: ArrayBuffer[Double] = new ArrayBuffer[Double]()
 		var width = 0
@@ -60,5 +61,15 @@ object FilterFactory extends Logging {
 		}
 
 		new Mask(filter, width, height)
+	}
+
+	def getGaussianImage: Mask = {
+//		val f: Gaussian = new Gaussian(1, 1)
+//
+//		info(f sample 100)
+
+
+
+		getArrayByName("gaussian")
 	}
 }
