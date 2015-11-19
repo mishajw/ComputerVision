@@ -13,12 +13,10 @@ object FilterFactory extends Logging {
 	type Mask = Matrix[Double]
 
 	abstract sealed class FilterType
-
 	case object FilterSobel extends FilterType
-
 	case object FilterRoberts extends FilterType
-
 	case object FilterGaussian extends FilterType
+	case object FilterPrewitt extends FilterType
 
 	lazy val json = new JSONObject(Source.fromFile("src/main/resources/json/filters.json").mkString)
 
@@ -36,6 +34,9 @@ object FilterFactory extends Logging {
 			getArrayByName("robertsY"))
 		case FilterGaussian => new SimpleFilter(
 			/*getArrayByName("gaussian")*/getGaussianImage)
+		case FilterPrewitt => new EdgeDetectionFilter(
+			getArrayByName("prewittX"),
+			getArrayByName("prewittY"))
 	}
 
 	/**

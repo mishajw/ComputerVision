@@ -4,7 +4,7 @@ import javax.swing._
 
 import grizzled.slf4j.Logging
 import vision.filters.{Filter, FilterFactory}
-import vision.filters.FilterFactory.{FilterGaussian, FilterSobel}
+import vision.filters.FilterFactory._
 import vision.util.ImageWrapper
 
 object ComputerVisionMain extends Logging {
@@ -17,13 +17,13 @@ object ComputerVisionMain extends Logging {
 
 		val imageSample = new ImageWrapper(s"${imagesPath}sample-edges/$imageName Edges.bmp", false)
 
-		val gauss = FilterFactory.getFilter(FilterGaussian)
-		val sobel = FilterFactory.getFilter(FilterSobel)
+		val edgeDetection = FilterFactory.getFilter(FilterRoberts)
+		val smoothing = FilterFactory.getFilter(FilterGaussian)
 
 		new ImageWrapper(s"${imagesPath}orig/$imageName.bmp", false)
-			.convolute(gauss)
+			.convolute(smoothing)
 			.applyThreshold(40)
-			.convolute(sobel)
+			.convolute(edgeDetection)
 			.applyThreshold(50)
 			.flip
 			.display
