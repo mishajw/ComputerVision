@@ -1,8 +1,8 @@
 package vision.util
 
 import java.awt.image.BufferedImage
-import java.io.File
-import java.net.URL
+import java.io.{FileNotFoundException, File}
+import java.net.{MalformedURLException, URL}
 import javax.imageio.ImageIO
 import javax.swing.{ImageIcon, JLabel, JOptionPane}
 
@@ -10,26 +10,22 @@ import grizzled.slf4j.Logging
 import vision.filters.Filter
 
 import scala.collection.mutable.ArrayBuffer
+import scala.io.Source
 
 class ImageWrapper(private val _pixels: Matrix[Int]) extends Cloneable with Logging {
-	def this(path: String, isUrl: Boolean) {
+	def this(path: String) {
 		this({
 			var rgbImage: BufferedImage = null
 
-			if (!isUrl) {
-				val file = new File(path)
-
-				// validation
-				if (!file.exists()) {
-					Console.err.println("Input file does not exist")
-					sys.exit(1)
-				}
-
-				rgbImage = ImageIO.read(file)
-			} else {
+			try
 				rgbImage = ImageIO.read(new URL(path))
+			catch {
+				case e: MalformedURLException =>
+					val f = new File(path)
+					if (!f.exists())
+						throw new FileNotFoundException(s"Could not find URL or file with the path '$path'")
+					rgbImage = ImageIO.read(f)
 			}
-
 
 			val greyImage = new BufferedImage(rgbImage.getWidth, rgbImage.getHeight, BufferedImage.TYPE_BYTE_GRAY)
 			greyImage.getGraphics.drawImage(rgbImage, 0, 0, null)
@@ -80,12 +76,12 @@ class ImageWrapper(private val _pixels: Matrix[Int]) extends Cloneable with Logg
 	})
 
 	def applyThreshold(threshold: Int) = new ImageWrapper({
-			if (threshold < 0 || threshold > 255)
-				throw new IllegalArgumentException("Invalid threshold")
+		if (threshold < 0 || threshold > 255)
+			throw new IllegalArgumentException("Invalid threshold")
 
-			debug(s"Applying threshold of $threshold")
-			new Matrix[Int](pixels.array map (x => if (x >= threshold) 255 else 0), width, height)
-		})
+		debug(s"Applying threshold of $threshold")
+		new Matrix[Int](pixels.array map (x => if (x >= threshold) 255 else 0), width, height)
+	})
 
 	def flip = new ImageWrapper({
 		new Matrix[Int](pixels.array map (x => 255 - x), width, height)
