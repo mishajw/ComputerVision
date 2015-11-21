@@ -15,7 +15,7 @@ object FilterFactory extends Logging {
 	abstract sealed class FilterType
 	case object FilterSobel extends FilterType
 	case object FilterRoberts extends FilterType
-	case object FilterGaussian extends FilterType
+	case class  FilterGaussian(size: Int) extends FilterType
 	case object FilterPrewitt extends FilterType
 
 	lazy val json = new JSONObject(Source.fromFile("src/main/resources/json/filters.json").mkString)
@@ -32,8 +32,8 @@ object FilterFactory extends Logging {
 		case FilterRoberts => new EdgeDetectionFilter(
 			getArrayByName("robertsX"),
 			getArrayByName("robertsY"))
-		case FilterGaussian => new SimpleFilter(
-			/*getArrayByName("gaussian")*/getGaussianImage)
+		case FilterGaussian(size) => new SimpleFilter(
+			/*getArrayByName("gaussian")*/getGaussianImage(size))
 		case FilterPrewitt => new EdgeDetectionFilter(
 			getArrayByName("prewittX"),
 			getArrayByName("prewittY"))
@@ -64,13 +64,16 @@ object FilterFactory extends Logging {
 		new Mask(filter, width, height)
 	}
 
-	def getGaussianImage: Mask = {
-//		val f: Gaussian = new Gaussian(1, 1)
-//
-//		info(f sample 100)
+	def getGaussianImage(size: Int): Mask = {
 
+    val gaussian = breeze.stats.distributions.Gaussian(0, 1)
+    val step = 2d / size.asInstanceOf[Double]
+    var filter = new ArrayBuffer[Double]()
 
+    for (x <- -1.0 to (1.0, step); y <- -1.0 to (1.0, step)) {
+      filter = filter :+ gaussian.cdf(x) * gaussian.cdf(x)
+    }
 
-		getArrayByName("gaussian")
+    new Mask(filter, size, size)
 	}
 }

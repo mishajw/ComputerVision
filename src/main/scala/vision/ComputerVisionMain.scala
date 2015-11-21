@@ -3,8 +3,8 @@ package vision
 import javax.swing._
 
 import grizzled.slf4j.Logging
-import vision.filters.{Filter, FilterFactory}
-import vision.filters.FilterFactory._
+import vision.filters.FilterFactory
+import vision.filters.FilterFactory.{FilterRoberts, FilterGaussian}
 import vision.util.ImageWrapper
 
 object ComputerVisionMain extends Logging {
@@ -13,22 +13,25 @@ object ComputerVisionMain extends Logging {
 	def main(args: Array[String]): Unit = {
 		info("Starting...")
 
-		val imageName = "10905 JL"
+		val imageName = Seq("10905 JL", "43590 AM", "9343 AM")(0)
 
 		val imageSample = new ImageWrapper(s"${imagesPath}sample-edges/$imageName Edges.bmp")
 
 		val edgeDetection = FilterFactory.getFilter(FilterRoberts)
-		val smoothing = FilterFactory.getFilter(FilterGaussian)
+		val smoothing = FilterFactory.getFilter(FilterGaussian(10))
 
-		new ImageWrapper(s"${imagesPath}orig/$imageName.bmp")
+    info(smoothing)
+
+		val imageEdited = new ImageWrapper(s"${imagesPath}orig/$imageName.bmp")
 			.convolute(smoothing)
+			.normalise
 			.applyThreshold(40)
 			.convolute(edgeDetection)
 			.applyThreshold(50)
 			.flip
 			.display
 
-		imageSample.display
+		info(imageEdited checkValidity imageSample)
 	}
 
 	private def askForImage() = {

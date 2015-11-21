@@ -13,6 +13,7 @@ import scala.collection.mutable.ArrayBuffer
 import scala.io.Source
 
 class ImageWrapper(private val _pixels: Matrix[Int]) extends Cloneable with Logging {
+
 	def this(path: String) {
 		this({
 			var rgbImage: BufferedImage = null
@@ -23,7 +24,7 @@ class ImageWrapper(private val _pixels: Matrix[Int]) extends Cloneable with Logg
 				case e: MalformedURLException =>
 					val f = new File(path)
 					if (!f.exists())
-						throw new FileNotFoundException(s"Could not find URL or file with the path '$path'")
+					throw new FileNotFoundException(s"Could not find URL or file with the path '$path'")
 					rgbImage = ImageIO.read(f)
 			}
 
@@ -60,7 +61,7 @@ class ImageWrapper(private val _pixels: Matrix[Int]) extends Cloneable with Logg
 	}
 
 	override def clone =
-		new ImageWrapper(pixels.clone.asInstanceOf[Matrix[Int]])
+	new ImageWrapper(pixels.clone.asInstanceOf[Matrix[Int]])
 
 	def normalise = new ImageWrapper({
 		val max: Double = pixels.array.max
@@ -77,7 +78,7 @@ class ImageWrapper(private val _pixels: Matrix[Int]) extends Cloneable with Logg
 
 	def applyThreshold(threshold: Int) = new ImageWrapper({
 		if (threshold < 0 || threshold > 255)
-			throw new IllegalArgumentException("Invalid threshold")
+		throw new IllegalArgumentException("Invalid threshold")
 
 		debug(s"Applying threshold of $threshold")
 		new Matrix[Int](pixels.array map (x => if (x >= threshold) 255 else 0), width, height)
@@ -88,4 +89,20 @@ class ImageWrapper(private val _pixels: Matrix[Int]) extends Cloneable with Logg
 	})
 
 	def convolute(filter: Filter) = filter convolute this
+
+	def checkValidity(sample: ImageWrapper): Double = {
+		var validity = 0
+
+		val maxWidth = width max sample.width
+		val maxHeight = height max sample.height
+		for (x <- 0 until maxWidth; y <- 0 until maxHeight) {
+			if ((getPixel(x, y) - sample.getPixel(x, y)).abs == 0) {
+				validity += 1
+			}
+		}
+
+		info(validity)
+
+		validity.toDouble / (maxWidth * maxHeight).toDouble
+	}
 }
