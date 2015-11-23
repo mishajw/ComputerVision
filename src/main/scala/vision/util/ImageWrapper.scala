@@ -1,7 +1,7 @@
 package vision.util
 
 import java.awt.image.BufferedImage
-import java.io.{FileNotFoundException, File}
+import java.io.{File, FileNotFoundException}
 import java.net.{MalformedURLException, URL}
 import javax.imageio.ImageIO
 import javax.swing.{ImageIcon, JLabel, JOptionPane}
@@ -10,9 +10,13 @@ import grizzled.slf4j.Logging
 import vision.filters.Filter
 
 import scala.collection.mutable.ArrayBuffer
-import scala.io.Source
 
 class ImageWrapper(private val _pixels: Matrix[Int]) extends Cloneable with Logging {
+
+	case class TestResults(var tp: Double, var tn: Double, var fp: Double, var fn: Double) {
+		def sensitivity = tp / (tp + fn)
+		def specificity = tn / (tn + fp)
+	}
 
 	def this(path: String) {
 		this({
@@ -60,8 +64,7 @@ class ImageWrapper(private val _pixels: Matrix[Int]) extends Cloneable with Logg
 		this
 	}
 
-	override def clone =
-	new ImageWrapper(pixels.clone.asInstanceOf[Matrix[Int]])
+	override def clone = new ImageWrapper(pixels.clone)
 
 	def normalise = new ImageWrapper({
 		val max: Double = pixels.array.max
@@ -90,19 +93,25 @@ class ImageWrapper(private val _pixels: Matrix[Int]) extends Cloneable with Logg
 
 	def convolute(filter: Filter) = filter convolute this
 
-	def checkValidity(sample: ImageWrapper): Double = {
-		var validity = 0
+	def checkValidity(sample: ImageWrapper): TestResults = {
+		val results = TestResults(0, 0, 0, 0)
 
 		val maxWidth = width max sample.width
 		val maxHeight = height max sample.height
 		for (x <- 0 until maxWidth; y <- 0 until maxHeight) {
-			if ((getPixel(x, y) - sample.getPixel(x, y)).abs == 0) {
-				validity += 1
+			val thisPositive = getPixel(x, y) > 0
+			val otherPositive = sample.getPixel(x, y) > 0
+
+			(thisPositive, otherPositive) match {
+				case (true, true) => results.tp += 1
+				case (true, false) => results.fp += 1
+				case (false, true) => results.fn += 1
+				case (false, false) => results.tn += 1
 			}
 		}
 
-		info(validity)
+//		results.normalise()
 
-		validity.toDouble / (maxWidth * maxHeight).toDouble
+		results
 	}
 }
