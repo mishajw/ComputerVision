@@ -4,45 +4,34 @@ import javax.swing._
 
 import grizzled.slf4j.Logging
 import vision.filters.FilterFactory
-import vision.filters.FilterFactory.{FilterRoberts, FilterGaussian}
+import vision.filters.FilterFactory.{FilterGaussian, FilterRoberts}
 import vision.util.ImageWrapper
 
 object ComputerVisionMain extends Logging {
 	private val imagesPath = "src/main/resources/images/"
 
+	val defaultGauss = 3
+	val defaultFirstThreshold = 70
+	val defaultSecondThreshold = 30
+
+	val images = Seq("10905 JL", "43590 AM", "9343 AM")
+
 	def main(args: Array[String]): Unit = {
 		info("Starting...")
 
-		val imageName = Seq("10905 JL", "43590 AM", "9343 AM")(1)
-
-		val defaultGauss = 3
-		val defaultFirstThreshold = 70
-		val defaultSecondThreshold = 30
+		val imageName = images(1)
 
 		val startImage = new ImageWrapper(s"${imagesPath}orig/$imageName.bmp")
 		val sampleImage = new ImageWrapper(s"${imagesPath}sample-edges/$imageName Edges.bmp").flip.normalise
 
-		def editImage(startImage: ImageWrapper, gaussSize: Int, firstThreshold: Int, secondThreshold: Int): ImageWrapper = {
-			val edgeDetection = FilterFactory.getFilter(FilterRoberts)
-			val smoothing = FilterFactory.getFilter(FilterGaussian(gaussSize))
-
-			startImage
-				.convolute(smoothing)
-				.normalise
-				.applyThreshold(firstThreshold)
-				.convolute(edgeDetection)
-				.applyThreshold(secondThreshold)
-		}
-
-		def toGauss(i: Double) = (i * 15).asInstanceOf[Int] + 1
-		def toThreshold(i: Double) = (i * 255).asInstanceOf[Int]
-
 		val perfectGauss = toGauss(Analyser.analyse(startImage, sampleImage, (startImage: ImageWrapper, i: Double) => {
 			editImage(startImage, toGauss(i), defaultFirstThreshold, defaultSecondThreshold)
 		}))
+
 		val perfectFirstThreshold = toThreshold(Analyser.analyse(startImage, sampleImage, (startImage: ImageWrapper, i: Double) => {
 			editImage(startImage, defaultGauss, toThreshold(i), defaultSecondThreshold)
 		}))
+
 		val perfectSecondThreshold = toThreshold(Analyser.analyse(startImage, sampleImage, (startImage: ImageWrapper, i: Double) => {
 			editImage(startImage, defaultGauss, defaultFirstThreshold, toThreshold(i))
 		}))
@@ -60,6 +49,22 @@ object ComputerVisionMain extends Logging {
 		perfectImage.display
 		sampleImage.display
 	}
+
+	def editImage(startImage: ImageWrapper, gaussSize: Int, firstThreshold: Int, secondThreshold: Int): ImageWrapper = {
+		val edgeDetection = FilterFactory.getFilter(FilterRoberts)
+		val smoothing = FilterFactory.getFilter(FilterGaussian(gaussSize))
+
+		startImage
+			.convolute(smoothing)
+			.normalise
+			.applyThreshold(firstThreshold)
+			.convolute(edgeDetection)
+			.applyThreshold(secondThreshold)
+	}
+
+	def toGauss(i: Double) = (i * 15).asInstanceOf[Int] + 1
+	
+	def toThreshold(i: Double) = (i * 255).asInstanceOf[Int]
 
 	private def askForImage() = {
 		val path = new JTextField(20)
