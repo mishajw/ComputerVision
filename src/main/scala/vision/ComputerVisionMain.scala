@@ -19,10 +19,25 @@ object ComputerVisionMain extends Logging {
 	def main(args: Array[String]): Unit = {
 		info("Starting...")
 
-		val imageName = images(1)
+		val imageName = images(2)
 
 		val startImage = new ImageWrapper(s"${imagesPath}orig/$imageName.bmp")
 		val sampleImage = new ImageWrapper(s"${imagesPath}sample-edges/$imageName Edges.bmp").flip.normalise
+
+		val editedImage = editImage(startImage, 3, 50, 50)
+
+		val results = editedImage checkValidity sampleImage
+
+
+		info(s"Sensitivity: ${results.sensitivity}")
+		info(s"Specificity: ${results.specificity}")
+
+		editedImage.display
+
+//		runTests(startImage, sampleImage)
+	}
+
+	def runTests(startImage: ImageWrapper, sampleImage: ImageWrapper) {
 
 		val perfectGauss = toGauss(Analyser.analyse(startImage, sampleImage, (startImage: ImageWrapper, i: Double) => {
 			editImage(startImage, toGauss(i), defaultFirstThreshold, defaultSecondThreshold)
@@ -63,7 +78,7 @@ object ComputerVisionMain extends Logging {
 	}
 
 	def toGauss(i: Double) = (i * 15).asInstanceOf[Int] + 1
-	
+
 	def toThreshold(i: Double) = (i * 255).asInstanceOf[Int]
 
 	private def askForImage() = {
