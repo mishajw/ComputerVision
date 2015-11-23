@@ -10,9 +10,9 @@ libraryDependencies ++= Seq(
 	"org.clapper"                %% "grizzled-slf4j"      % "1.0.2",
 	"com.typesafe"                % "config"              % "1.3.0",
 	"org.json"                    % "json"                % "20150729",
-  "org.scalanlp" %% "breeze" % "0.11.2",
-  "org.scalanlp" %% "breeze-natives" % "0.11.2",
-  "org.scalanlp" %% "breeze-viz" % "0.11.2"
+  "org.scalanlp"               %% "breeze"              % "0.11.2",
+  "org.scalanlp"               %% "breeze-natives"      % "0.11.2",
+  "org.scalanlp"               %% "breeze-viz"          % "0.11.2"
 )
 
 resolvers ++= Seq(
