@@ -15,24 +15,23 @@ object ComputerVisionMain extends Logging {
 
 		val imageName = Seq("10905 JL", "43590 AM", "9343 AM")(0)
 
-		val imageSample = new ImageWrapper(s"${imagesPath}sample-edges/$imageName Edges.bmp").flip
 
-		val edgeDetection = FilterFactory.getFilter(FilterRoberts)
-		val smoothing = FilterFactory.getFilter(FilterGaussian(10))
+		val sampleImage = new ImageWrapper(s"${imagesPath}sample-edges/$imageName Edges.bmp").flip.normalise
+		val startImage = new ImageWrapper(s"${imagesPath}orig/$imageName.bmp")
 
-    info(smoothing)
+		Analyser.analyse(startImage, sampleImage, (startImage: ImageWrapper, i: Double) => {
+			val edgeDetection = FilterFactory.getFilter(FilterRoberts)
+			val smoothing = FilterFactory.getFilter(FilterGaussian((i * 15).asInstanceOf[Int] + 1))
 
-		val imageEdited = new ImageWrapper(s"${imagesPath}orig/$imageName.bmp")
-			.convolute(smoothing)
-			.normalise
-			.applyThreshold(50)
-			.convolute(edgeDetection)
-			.applyThreshold(50)
-			.display
+			startImage
+				.convolute(smoothing)
+				.normalise
+				.applyThreshold(70)
+				.convolute(edgeDetection)
+				.applyThreshold(30)
+		})
 
-		val results = imageEdited checkValidity imageSample
-		info(s"Sensitivity: ${results.sensitivity}")
-		info(s"Specificity: ${results.specificity}")
+
 	}
 
 	private def askForImage() = {
