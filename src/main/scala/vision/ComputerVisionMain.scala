@@ -24,15 +24,19 @@ object ComputerVisionMain extends Logging {
 		val startImage = new ImageWrapper(s"${imagesPath}orig/$imageName.bmp")
 		val sampleImage = new ImageWrapper(s"${imagesPath}sample-edges/$imageName Edges.bmp").flip.normalise
 
-		val editedImage = editImage(startImage, 3, 50, 50)
+    for (i <- 3 to (21, 2)) {
+      info(FilterFactory.getFilter(FilterGaussian(i, 1)))
+    }
 
-		val results = editedImage checkValidity sampleImage
-
-
-		info(s"Sensitivity: ${results.sensitivity}")
-		info(s"Specificity: ${results.specificity}")
-
-		editedImage.display
+//		val editedImage = editImage(startImage, 3, 50, 50)
+//
+//		val results = editedImage checkValidity sampleImage
+//
+//
+//		info(s"Sensitivity: ${results.sensitivity}")
+//		info(s"Specificity: ${results.specificity}")
+//
+//		editedImage.display
 
 //		runTests(startImage, sampleImage)
 	}
@@ -67,7 +71,7 @@ object ComputerVisionMain extends Logging {
 
 	def editImage(startImage: ImageWrapper, gaussSize: Int, firstThreshold: Int, secondThreshold: Int): ImageWrapper = {
 		val edgeDetection = FilterFactory.getFilter(FilterRoberts)
-		val smoothing = FilterFactory.getFilter(FilterGaussian(gaussSize))
+		val smoothing = FilterFactory.getFilter(FilterGaussian(gaussSize, 1))
 
 		startImage
 			.convolute(smoothing)

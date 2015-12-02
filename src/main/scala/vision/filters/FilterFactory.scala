@@ -3,6 +3,7 @@ package vision.filters
 //import breeze.stats.distributions.Gaussian
 import grizzled.slf4j.Logging
 import org.json.JSONObject
+import vision.analysis.Operations._
 import vision.util.Matrix
 
 import scala.collection.mutable.ArrayBuffer
@@ -12,12 +13,6 @@ object FilterFactory extends Logging {
 
 	type Mask = Matrix[Double]
 
-	abstract sealed class FilterType
-	case object FilterSobel extends FilterType
-	case object FilterRoberts extends FilterType
-	case class  FilterGaussian(size: Int) extends FilterType
-	case object FilterPrewitt extends FilterType
-
 	lazy val json = new JSONObject(Source.fromFile("src/main/resources/json/filters.json").mkString)
 
 	/**
@@ -25,16 +20,16 @@ object FilterFactory extends Logging {
 		* @param filterType The type of filter
 		* @return actual filter object
 		*/
-	def getFilter(filterType: FilterType) = filterType match {
-		case FilterSobel => new EdgeDetectionFilter(
+	def getFilter(filterType: FilterOperation) = filterType match {
+		case Sobel => new EdgeDetectionFilter(
 			getArrayByName("sobelX"),
 			getArrayByName("sobelY"))
-		case FilterRoberts => new EdgeDetectionFilter(
+		case Roberts => new EdgeDetectionFilter(
 			getArrayByName("robertsX"),
 			getArrayByName("robertsY"))
-		case FilterGaussian(size) => new SimpleFilter(
-			/*getArrayByName("gaussian")*/getGaussianImage(size))
-		case FilterPrewitt => new EdgeDetectionFilter(
+		case Gaussian(size, sd) => new SimpleFilter(
+			/*getArrayByName("gaussian")*/getGaussianImage(size, sd))
+		case Prewitt => new EdgeDetectionFilter(
 			getArrayByName("prewittX"),
 			getArrayByName("prewittY"))
 	}
@@ -64,9 +59,9 @@ object FilterFactory extends Logging {
 		new Mask(filter, width, height)
 	}
 
-	def getGaussianImage(size: Int): Mask = {
+	def getGaussianImage(size: Int, sd: Double): Mask = {
 
-    val gaussian = breeze.stats.distributions.Gaussian(0, 1)
+    val gaussian = breeze.stats.distributions.Gaussian(0, sd)
     val step = 2d / size.asInstanceOf[Double]
     var filter = new ArrayBuffer[Double]()
 

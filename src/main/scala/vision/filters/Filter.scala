@@ -24,7 +24,6 @@ abstract class Filter {
 				total += v
 			}
 
-			//			info(total)
 			newImage.setPixel(x, y, total.asInstanceOf[Int])
 		}
 

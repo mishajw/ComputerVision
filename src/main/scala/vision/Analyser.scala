@@ -6,10 +6,6 @@ import grizzled.slf4j.Logging
 import vision.util.ImageWrapper
 
 object Analyser extends Logging {
-	def getPerfect() = {
-
-	}
-
 	def analyse(startImage: ImageWrapper, sampleImage: ImageWrapper, editFunction: (ImageWrapper, Double) => ImageWrapper) = {
 		var points: List[(Double, Double, Double)] = List()
 

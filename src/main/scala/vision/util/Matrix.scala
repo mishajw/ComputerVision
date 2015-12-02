@@ -33,7 +33,6 @@ class Matrix[T](matrixArray: ArrayBuffer[T], matrixWidth: Int, matrixHeight: Int
 
 	def width = _width
 
-
 	def height = _height
 
 	def get(x: Int, y: Int, default: T): T = {
@@ -54,5 +53,9 @@ class Matrix[T](matrixArray: ArrayBuffer[T], matrixWidth: Int, matrixHeight: Int
 		new Matrix[T](newArray, _width, _height)
 	}
 
-	override def toString: String = matrixArray.toString
+	override def toString: String = {
+    "\n" + array.indices.map(i => f"${array(i).asInstanceOf[Double]}%.3f" + {
+      if (i % height == 0) "]\n[" else ", "
+    }).mkString
+  }
 }
