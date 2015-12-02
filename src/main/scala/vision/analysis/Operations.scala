@@ -1,22 +1,20 @@
 package vision.analysis
 
-import vision.filters.FilterFactory.FilterGaussian
-import vision.filters.{FilterFactory, Filter}
-
 object Operations {
 
   private val STANDARD_THRESHOLDS = 20 to 100 by 20
 
 	// thresholds of 20, 40, 60, 80, 100
 	val TRANSFORMATIONS = Seq(TransformationIntensity) ++
-		(STANDARD_THRESHOLDS map Transfo`rmationBinary)
+		(STANDARD_THRESHOLDS map TransformationBinary)
 
   val NOISE_REMOVAL = {
     var x: List[NoiseRemoval] = List()
 
-    for (size <- 3 to 25 by 2; sd <- 0.0 to 1.0 by 0.1) {
+    for (size <- 3 to 25 by 2; sd <- 0.0 to 1.0 by 0.1)
       x = x :+ Gaussian(size, sd)
-    }
+    for (size <- 3 to 25)
+      x = x :+ SimpleMean(size)
 
     x
   }
@@ -42,7 +40,7 @@ object Operations {
 
 	abstract sealed class NoiseRemoval extends FilterOperation
 
-  case object SimpleMean extends NoiseRemoval
+  case class SimpleMean(size: Int) extends NoiseRemoval
 
 	case class Gaussian(size: Int, standardDeviation: Double) extends NoiseRemoval
 

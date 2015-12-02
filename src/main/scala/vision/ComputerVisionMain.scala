@@ -3,8 +3,8 @@ package vision
 import javax.swing._
 
 import grizzled.slf4j.Logging
+import vision.analysis.Operations.{Roberts, Gaussian}
 import vision.filters.FilterFactory
-import vision.filters.FilterFactory.{FilterGaussian, FilterRoberts}
 import vision.util.ImageWrapper
 
 object ComputerVisionMain extends Logging {
@@ -25,7 +25,7 @@ object ComputerVisionMain extends Logging {
 		val sampleImage = new ImageWrapper(s"${imagesPath}sample-edges/$imageName Edges.bmp").flip.normalise
 
     for (i <- 3 to (21, 2)) {
-      info(FilterFactory.getFilter(FilterGaussian(i, 1)))
+      info(FilterFactory.getFilter(Gaussian(i, 1)))
     }
 
 //		val editedImage = editImage(startImage, 3, 50, 50)
@@ -70,8 +70,8 @@ object ComputerVisionMain extends Logging {
 	}
 
 	def editImage(startImage: ImageWrapper, gaussSize: Int, firstThreshold: Int, secondThreshold: Int): ImageWrapper = {
-		val edgeDetection = FilterFactory.getFilter(FilterRoberts)
-		val smoothing = FilterFactory.getFilter(FilterGaussian(gaussSize, 1))
+		val edgeDetection = FilterFactory.getFilter(Roberts)
+		val smoothing = FilterFactory.getFilter(Gaussian(gaussSize, 1))
 
 		startImage
 			.convolute(smoothing)

@@ -15,23 +15,27 @@ object FilterFactory extends Logging {
 
 	lazy val json = new JSONObject(Source.fromFile("src/main/resources/json/filters.json").mkString)
 
-	/**
+  /**
 		* Get a filter by its type
 		* @param filterType The type of filter
 		* @return actual filter object
 		*/
 	def getFilter(filterType: FilterOperation) = filterType match {
+    case SimpleGradient => new EdgeDetectionFilter(
+        getArrayByName("simpleX"),
+        getArrayByName("simpleY"))
 		case Sobel => new EdgeDetectionFilter(
 			getArrayByName("sobelX"),
 			getArrayByName("sobelY"))
 		case Roberts => new EdgeDetectionFilter(
 			getArrayByName("robertsX"),
 			getArrayByName("robertsY"))
-		case Gaussian(size, sd) => new SimpleFilter(
-			/*getArrayByName("gaussian")*/getGaussianImage(size, sd))
 		case Prewitt => new EdgeDetectionFilter(
 			getArrayByName("prewittX"),
 			getArrayByName("prewittY"))
+
+    case SimpleMean(size) => new SimpleFilter(getMeanFilter(size))
+		case Gaussian(size, sd) => new SimpleFilter(getGaussianImage(size, sd))
 	}
 
 	/**
@@ -71,4 +75,8 @@ object FilterFactory extends Logging {
 
     new Mask(filter, size, size)
 	}
+
+  def getMeanFilter(size: Int): Mask = {
+    new Mask(ArrayBuffer.fill(size * size)(1 / (size.toDouble * size.toDouble)), size, size)
+  }
 }

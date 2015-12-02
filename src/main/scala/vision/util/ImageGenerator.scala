@@ -10,14 +10,15 @@ object ImageGenerator extends Logging {
       t <- TRANSFORMATIONS;
       nrf <- NOISE_REMOVAL.map(FilterFactory.getFilter);
       edf <- EDGE_DETECTORS.map(FilterFactory.getFilter);
-      fin <- FINAL_THRESHOLDS;
-    ) {
-      generateImage(original, t, nrf, edf, fin);
+      fin <- FINAL_THRESHOLDS) {
+      val image = generateImage(original, t, nrf, edf, fin)
+
+      image.createImage
     }
   }
 
   def generateImage(original: ImageWrapper, transformation: ImageTransformation, nrf: Filter,
-                    edf: Filter, fin: FinalThreshold): Unit = {
+                    edf: Filter, fin: FinalThreshold): ImageWrapper = {
     (transformation match {
       case TransformationIntensity => original
       case TransformationBinary(n) => original.applyThreshold(n);
