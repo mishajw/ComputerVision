@@ -10,21 +10,24 @@ object Operations {
 
 	// todo noise removals
 
-	abstract sealed class ImageTransformation
+	abstract sealed class Operation
+
+
+	abstract sealed class ImageTransformation extends Operation
 
 	case object TransformationIntensity extends ImageTransformation
 
 	case class TransformationBinary(threshold: Int) extends ImageTransformation
 
 
-	abstract sealed class NoiseRemoval
+	abstract sealed class NoiseRemoval extends Operation
 
 	case object SimpleMean extends NoiseRemoval
 
 	case class Gaussian(size: Int, standardDeviation: Int) extends NoiseRemoval
 
 
-	abstract sealed class EdgeDetection
+	abstract sealed class EdgeDetection extends Operation
 
 	case object SimpleGradient extends EdgeDetection
 
