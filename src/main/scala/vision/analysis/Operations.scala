@@ -13,7 +13,7 @@ object Operations {
 
     for (size <- 3 to 25 by 2; sd <- 0.0 to 1.0 by 0.1)
       x = x :+ Gaussian(size, sd)
-    for (size <- 3 to 25)
+    for (size <- 3 to 25 by 2)
       x = x :+ SimpleMean(size)
 
     x

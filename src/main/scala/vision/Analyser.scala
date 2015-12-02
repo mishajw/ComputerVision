@@ -28,8 +28,8 @@ object Analyser extends Logging {
 	def drawResults(points: List[(Double, Double, Double)]) = {
 		val f = Figure()
 		val p = f.subplot(0)
-		val x = DenseVector(points.map(_._2).toArray) // (0, 1, 3, 6)
-		val y = DenseVector(points.map(_._3).toArray) // (0, 1, 2, 3)
+		val x = DenseVector(points.map(_._2).toArray)
+		val y = DenseVector(points.map(_._3).toArray)
 		info(x)
 		p += plot(x, y)
 		p.xlabel = "Sensitivity"

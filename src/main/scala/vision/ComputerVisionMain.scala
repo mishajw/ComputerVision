@@ -5,7 +5,7 @@ import javax.swing._
 import grizzled.slf4j.Logging
 import vision.analysis.Operations.{Roberts, Gaussian}
 import vision.filters.FilterFactory
-import vision.util.ImageWrapper
+import vision.util.{ImageGenerator, ImageWrapper}
 
 object ComputerVisionMain extends Logging {
 	private val imagesPath = "src/main/resources/images/"
@@ -24,9 +24,11 @@ object ComputerVisionMain extends Logging {
 		val startImage = new ImageWrapper(s"${imagesPath}orig/$imageName.bmp")
 		val sampleImage = new ImageWrapper(s"${imagesPath}sample-edges/$imageName Edges.bmp").flip.normalise
 
-    for (i <- 3 to (21, 2)) {
-      info(FilterFactory.getFilter(Gaussian(i, 1)))
-    }
+//    for (i <- 3 to (21, 2)) {
+//      info(FilterFactory.getFilter(Gaussian(i, 1)))
+//    }
+
+    ImageGenerator.generateAll(startImage, sampleImage)
 
 //		val editedImage = editImage(startImage, 3, 50, 50)
 //
