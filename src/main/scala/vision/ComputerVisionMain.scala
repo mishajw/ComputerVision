@@ -35,6 +35,10 @@ object ComputerVisionMain extends Logging {
 //    info("Hello??")
 //    info(s"${results.tpr}, ${results.fpr}")
 
+//		startImage
+//			.applyThreshold(35)
+//			.display
+
 		ImageGenerator.generateAll(startImage, sampleImage)
 	}
 
