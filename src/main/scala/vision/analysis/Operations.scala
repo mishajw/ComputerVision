@@ -2,7 +2,7 @@ package vision.analysis
 
 object Operations {
 
-	private val STANDARD_THRESHOLDS = 20 to 100
+	private val STANDARD_THRESHOLDS = 20 to 100 by 10
 
 	// thresholds of 20, 40, 60, 80, 100
 	val TRANSFORMATIONS = Seq(TransformationIntensity) ++

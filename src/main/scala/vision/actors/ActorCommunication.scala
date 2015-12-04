@@ -10,6 +10,8 @@ object ActorCommunication {
 	case class ImageDetails(original: ImageWrapper, sample: ImageWrapper,
 													t: ImageTransformation, nrf: NoiseRemoval, edf: EdgeDetection, fin: FinalThreshold) extends Message
 
+	case class Images(details: List[ImageDetails]) extends Message
+
 	case object ImageDone extends Message
 
 	case object PrintFrequency extends Message

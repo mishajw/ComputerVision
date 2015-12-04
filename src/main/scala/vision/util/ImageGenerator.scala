@@ -2,7 +2,7 @@ package vision.util
 
 import akka.actor.{ActorSystem, Props}
 import grizzled.slf4j.Logging
-import vision.actors.ActorCommunication.{ImageDetails, PrintFrequency}
+import vision.actors.ActorCommunication.{Images, ImageDetails, PrintFrequency}
 import vision.actors.MasterImageGenerator
 import vision.analysis.Operations._
 
@@ -18,17 +18,22 @@ object ImageGenerator extends Logging {
 		val system = ActorSystem("vision")
 		val master = system.actorOf(Props[MasterImageGenerator])
 
-		info("Starting image generation")
+		info("Collecting images")
+
+		var images: List[ImageDetails] = List()
 		for (
 			t <- Random.shuffle(TRANSFORMATIONS);
 			nrf <- Random.shuffle(NOISE_REMOVAL); //.map(FilterFactory.getFilter);
 			edf <- Random.shuffle(EDGE_DETECTORS); //.map(FilterFactory.getFilter);
 			fin <- Random.shuffle(FINAL_THRESHOLDS)) {
-			master ! ImageDetails(original, sample, t, nrf, edf, fin)
-			count += 1
+			images = images :+ ImageDetails(original, sample, t, nrf, edf, fin)
 		}
 
-		info(s"Total images: $count")
+		info(s"Total images: ${images.size}")
+
+		info("Sending to master")
+		master ! Images(images)
+
 		info("Printing results")
 		while (true) {
 			master ! PrintFrequency
