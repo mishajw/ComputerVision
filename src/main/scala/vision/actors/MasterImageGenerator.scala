@@ -7,6 +7,8 @@ import vision.actors.ActorCommunication.{Images, ImageDetails, ImageDone, PrintF
 
 class MasterImageGenerator extends Actor with Logging {
 
+	info("Starting masters")
+
 	val router = context.actorOf(Props[WorkerImageGenerator].withRouter(RoundRobinRouter(nrOfInstances = 5)), "router")
 //	val router = context.actorOf(BalancingPool(5).props(Props[WorkerImageGenerator]), "router")
 
@@ -15,10 +17,12 @@ class MasterImageGenerator extends Actor with Logging {
 	var total = 0
 
 	override def receive = {
-		case ImageDetails(original, sample, t, nrf, edf, fin) =>
+		case ImageDetails(original, sample, operations) =>
 			debug("Got image details")
-			router ! ImageDetails(original, sample, t, nrf, edf, fin)
+			router ! ImageDetails(original, sample, operations)
+			total += 1
 		case Images(details) =>
+			debug("Got multiple image details")
 			details.foreach(router !)
 			total += details.size
 		case ImageDone =>

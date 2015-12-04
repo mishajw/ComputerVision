@@ -22,11 +22,12 @@ object ImageGenerator extends Logging {
 
 		var images: List[ImageDetails] = List()
 		for (
-			t <- Random.shuffle(TRANSFORMATIONS);
+			transform <- Random.shuffle(TRANSFORMATIONS);
 			nrf <- Random.shuffle(NOISE_REMOVAL); //.map(FilterFactory.getFilter);
 			edf <- Random.shuffle(EDGE_DETECTORS); //.map(FilterFactory.getFilter);
 			fin <- Random.shuffle(FINAL_THRESHOLDS)) {
-			images = images :+ ImageDetails(original, sample, t, nrf, edf, fin)
+			images = images :+ ImageDetails(original, sample, Seq(transform, nrf, edf, NormaliseOperation, fin, FlipOperation))
+
 		}
 
 		info(s"Total images: ${images.size}")

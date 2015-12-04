@@ -4,8 +4,9 @@ object Operations {
 
 	private val STANDARD_THRESHOLDS = 20 to 100 by 10
 
-	val TRANSFORMATIONS = Seq(TransformationBinary(35))/* ++
-		(STANDARD_THRESHOLDS map TransformationBinary)*/
+	val TRANSFORMATIONS = Seq(ThresholdOperation(35))
+	/* ++
+			(STANDARD_THRESHOLDS map TransformationBinary)*/
 
 	val NOISE_REMOVAL = {
 		var x: List[NoiseRemoval] = List()
@@ -20,7 +21,7 @@ object Operations {
 
 	val EDGE_DETECTORS = Seq(SimpleGradient, Sobel, Roberts, /*Prewitt, */Laplacian)
 
-	val FINAL_THRESHOLDS = STANDARD_THRESHOLDS map FinalThreshold
+	val FINAL_THRESHOLDS = STANDARD_THRESHOLDS map ThresholdOperation
 
 	// todo noise removals
 
@@ -29,9 +30,11 @@ object Operations {
 
 	abstract sealed class ImageTransformation extends Operation
 
-	case object TransformationIntensity extends ImageTransformation
+	case class ThresholdOperation(threshold: Int) extends ImageTransformation
 
-	case class TransformationBinary(threshold: Int) extends ImageTransformation
+	case object NormaliseOperation extends Operation
+
+	case object FlipOperation extends Operation
 
 
 	abstract sealed class FilterOperation extends Operation
@@ -55,8 +58,4 @@ object Operations {
 	case object Prewitt extends EdgeDetection
 
 	case object Laplacian extends EdgeDetection
-
-
-	case class FinalThreshold(threshold: Int) extends Operation
-
 }
