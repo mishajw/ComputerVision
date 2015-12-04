@@ -33,6 +33,8 @@ class WorkerImageGenerator extends Actor with Logging {
 			case TransformationBinary(n) => original.applyThreshold(n);
 		}).convolute(nrf)
 			.convolute(edf)
+				.normalise
 			.applyThreshold(fin.threshold)
+				.flip
 	}
 }
