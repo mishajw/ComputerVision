@@ -5,15 +5,15 @@ object Operations {
 	private val STANDARD_THRESHOLDS = 20 to 100 by 10
 
 	// thresholds of 20, 40, 60, 80, 100
-	val TRANSFORMATIONS = Seq(TransformationIntensity) ++
-		(STANDARD_THRESHOLDS map TransformationBinary)
+	val TRANSFORMATIONS = Seq(TransformationIntensity, TransformationBinary(35))/* ++
+		(STANDARD_THRESHOLDS map TransformationBinary)*/
 
 	val NOISE_REMOVAL = {
 		var x: List[NoiseRemoval] = List()
 
-		for (size <- 2 to 7; sd <- 1d to 4d by 0.5)
+		for (size <- 2 to 7; sd <- 1d to 4d by 1d)
 			x = x :+ Gaussian(size, sd)
-		for (size <- 1 to 17 by 2)
+		for (size <- 1 to 7 by 2)
 			x = x :+ SimpleMean(size)
 
 		x

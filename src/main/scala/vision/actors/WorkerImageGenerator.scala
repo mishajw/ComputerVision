@@ -24,7 +24,7 @@ class WorkerImageGenerator extends Actor with Logging {
 //		info(s"$t, $nrf, $edf, $fin")
 //		info(f"${validity.sensitivity}%.2f, ${validity.specificity}%.2f")
 //
-		DB.insertResults(/*fileName*/"abc", t, nrf, edf, fin, 0, 0, 0)// validity.tpr, validity.fpr, validity.dist)
+		DB.insertResults(t, nrf, edf, fin, validity.tpr, validity.fpr, validity.dist)
 	}
 	def generateImage(original: ImageWrapper, transformation: ImageTransformation, nrf: Filter,
 										edf: Filter, fin: FinalThreshold): ImageWrapper = {

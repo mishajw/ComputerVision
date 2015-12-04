@@ -12,9 +12,9 @@ object DB {
 	val db = connection("vision")
 	val resultsCollection = db("results")
 
-	def insertResults(imageName: String, t: ImageTransformation, nrf: NoiseRemoval, edf: EdgeDetection, fin: FinalThreshold, tpr: Double, fpr: Double, dist: Double) {
+	def insertResults(t: ImageTransformation, nrf: NoiseRemoval, edf: EdgeDetection, fin: FinalThreshold, tpr: Double, fpr: Double, dist: Double) {
 		resultsCollection.save(MongoDBObject(
-			"imageName" -> imageName,
+			"transformation" -> t.toString,
 			"nrf" -> nrf.toString,
 			"edf" -> edf.toString,
 			"fin" -> fin.toString,
