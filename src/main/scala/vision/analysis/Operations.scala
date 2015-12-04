@@ -2,7 +2,7 @@ package vision.analysis
 
 object Operations {
 
-	private val STANDARD_THRESHOLDS = 20 to 100 by 20
+	private val STANDARD_THRESHOLDS = 20 to 100
 
 	// thresholds of 20, 40, 60, 80, 100
 	val TRANSFORMATIONS = Seq(TransformationIntensity) ++
@@ -11,7 +11,7 @@ object Operations {
 	val NOISE_REMOVAL = {
 		var x: List[NoiseRemoval] = List()
 
-		for (size <- 3 to 17 by 2; sd <- 0.0 to 1.0 by 0.2)
+		for (size <- 2 to 7; sd <- 1d to 4d by 0.5)
 			x = x :+ Gaussian(size, sd)
 		for (size <- 1 to 17 by 2)
 			x = x :+ SimpleMean(size)

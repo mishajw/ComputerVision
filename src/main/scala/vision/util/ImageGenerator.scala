@@ -1,11 +1,10 @@
 package vision.util
 
-import akka.actor.{Props, ActorSystem}
+import akka.actor.{ActorSystem, Props}
 import grizzled.slf4j.Logging
-import vision.actors.ActorCommunication.{PrintFrequency, ImageDetails}
+import vision.actors.ActorCommunication.{ImageDetails, PrintFrequency}
 import vision.actors.MasterImageGenerator
 import vision.analysis.Operations._
-import vision.filters.Filter
 
 import scala.util.Random
 
@@ -26,22 +25,14 @@ object ImageGenerator extends Logging {
 			edf <- Random.shuffle(EDGE_DETECTORS); //.map(FilterFactory.getFilter);
 			fin <- Random.shuffle(FINAL_THRESHOLDS)) {
 			master ! ImageDetails(original, sample, t, nrf, edf, fin)
+			count += 1
 		}
 
+		info(s"Total images: $count")
 		info("Printing results")
 		while (true) {
 			master ! PrintFrequency
 			Thread.sleep(1000)
 		}
-	}
-
-	def generateImage(original: ImageWrapper, transformation: ImageTransformation, nrf: Filter,
-										edf: Filter, fin: FinalThreshold): ImageWrapper = {
-		(transformation match {
-			case TransformationIntensity => original
-			case TransformationBinary(n) => original.applyThreshold(n);
-		}).convolute(nrf)
-			.convolute(edf)
-			.applyThreshold(fin.threshold)
 	}
 }

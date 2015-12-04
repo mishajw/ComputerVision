@@ -7,10 +7,10 @@ import vision.actors.ActorCommunication.{ImageDetails, ImageDone, PrintFrequency
 
 class MasterImageGenerator extends Actor with Logging {
 
-	val router = context.actorOf(Props[WorkerImageGenerator].withRouter(RoundRobinRouter(nrOfInstances = 10)),
-		"router")
+	val router = context.actorOf(Props[WorkerImageGenerator].withRouter(RoundRobinRouter(nrOfInstances = 5)), "router")
+//	val router = context.actorOf(BalancingPool(5).props(Props[WorkerImageGenerator]), "router")
 
-	val startTime = System.currentTimeMillis()
+	lazy val startTime = System.currentTimeMillis()
 	var amountDone = 0
 
 	override def receive = {

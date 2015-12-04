@@ -115,8 +115,6 @@ class ImageWrapper(private val _pixels: Matrix[Int]) extends Cloneable with Logg
 			}
 		}
 
-//		results.normalise()
-
 		results
 	}
 }
