@@ -4,7 +4,7 @@ import akka.actor.Actor
 import grizzled.slf4j.Logging
 import vision.actors.ActorCommunication.{ImageDetails, ImageDone}
 import vision.analysis.Operations._
-import vision.filters.{FilterFactory, Filter}
+import vision.filters.{Filter, FilterFactory}
 import vision.util.{DB, ImageWrapper}
 
 class WorkerImageGenerator extends Actor with Logging {
@@ -29,7 +29,7 @@ class WorkerImageGenerator extends Actor with Logging {
 	def generateImage(original: ImageWrapper, transformation: ImageTransformation, nrf: Filter,
 										edf: Filter, fin: FinalThreshold): ImageWrapper = {
 		(transformation match {
-			case TransformationIntensity => original
+			case TransformationIntensity => throw new IllegalArgumentException("neh")
 			case TransformationBinary(n) => original.applyThreshold(n);
 		}).convolute(nrf)
 			.convolute(edf)
