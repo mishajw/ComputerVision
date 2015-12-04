@@ -6,11 +6,11 @@ import akka.actor.Actor
 import grizzled.slf4j.Logging
 import vision.actors.ActorCommunication.{ImageDetails, ImageDone}
 import vision.analysis.Operations._
-import vision.filters.{Filter, FilterFactory}
+import vision.filters.FilterFactory
 import vision.util.{DB, ImageWrapper}
 
+import scala.collection.immutable.TreeMap
 import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
 import scala.util.control.Breaks._
 
 class WorkerImageGenerator extends Actor with Logging {
@@ -38,7 +38,7 @@ class WorkerImageGenerator extends Actor with Logging {
 
 object WorkerImageGenerator extends Logging {
 
-	val map = new ConcurrentHashMap[String, ImageWrapper]()
+	val map = new TreeMap[String, ImageWrapper]()
 
 	def transform(originalImage: ImageWrapper, operations: Array[Operation]): ImageWrapper = {
 		val workingSet = new mutable.Stack[Operation]()
@@ -48,7 +48,7 @@ object WorkerImageGenerator extends Logging {
 
 		// remove 1 by 1 until valid found
 		breakable {
-			while (workingSet.nonEmpty) Option(map.get(workingSet.mkString)) match {
+			while (workingSet.nonEmpty) (map.get(workingSet.mkString)) match {
 				case Some(x) => break
 				case None => holdingSet push (workingSet pop)
 			}

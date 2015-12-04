@@ -11,7 +11,7 @@ import vision.filters.Filter
 
 import scala.collection.mutable.ArrayBuffer
 
-class ImageWrapper(private val _pixels: Matrix[Int]) extends Cloneable with Logging {
+class ImageWrapper(private val _pixels: Matrix) extends Cloneable with Logging {
 
 	case class TestResults(var tp: Double, var tn: Double, var fp: Double, var fn: Double) {
 		def sensitivity = tp / (tp + fn)
@@ -40,20 +40,20 @@ class ImageWrapper(private val _pixels: Matrix[Int]) extends Cloneable with Logg
 			val greyImage = new BufferedImage(rgbImage.getWidth, rgbImage.getHeight, BufferedImage.TYPE_BYTE_GRAY)
 			greyImage.getGraphics.drawImage(rgbImage, 0, 0, null)
 
-			val greyPixels = greyImage.getRaster.getPixels(0, 0, greyImage.getWidth, greyImage.getHeight, null: Array[Int])
-			new Matrix[Int](greyPixels, greyImage.getWidth, greyImage.getHeight)
+			val greyPixels = greyImage.getRaster.getPixels(0, 0, greyImage.getWidth, greyImage.getHeight, null: Array[Double])
+			new Matrix(greyPixels, greyImage.getWidth, greyImage.getHeight)
 		})
 	}
 
-	private val pixels: Matrix[Int] = _pixels
+	private val pixels: Matrix = _pixels
 
 	def width = pixels.width
 
 	def height = pixels.height
 
-	def getPixel(x: Int, y: Int, default: Int): Int = pixels.get(x, y, default)
+	def getPixel(x: Int, y: Int, default: Int): Int = pixels.get(x, y, default).toInt
 
-	def getPixel(x: Int, y: Int): Int = pixels.get(x, y)
+	def getPixel(x: Int, y: Int): Int = pixels.get(x, y).toInt
 
 	def setPixel(x: Int, y: Int, value: Int) = pixels.set(x, y, value)
 
@@ -77,11 +77,11 @@ class ImageWrapper(private val _pixels: Matrix[Int]) extends Cloneable with Logg
 
 		debug("Normalising")
 
-		val normalisedArray: ArrayBuffer[Int] = pixels.array.map(pixel => {
-			(((pixel.toDouble - min) / (max - min)) * 255d).toInt
+		val normalisedArray: Array[Double] = pixels.array.map(pixel => {
+			((pixel - min) / (max - min)) * 255d
 		})
 
-		new Matrix[Int](normalisedArray, width, height)
+		new Matrix(normalisedArray, width, height)
 	})
 
 	def applyThreshold(threshold: Int) = new ImageWrapper({
@@ -89,11 +89,11 @@ class ImageWrapper(private val _pixels: Matrix[Int]) extends Cloneable with Logg
 		throw new IllegalArgumentException("Invalid threshold")
 
 		debug(s"Applying threshold of $threshold")
-		new Matrix[Int](pixels.array map (x => if (x >= threshold) 255 else 0), width, height)
+		new Matrix(pixels.array map (x => if (x >= threshold) 255d else 0d), width, height)
 	})
 
 	def flip = new ImageWrapper({
-		new Matrix[Int](pixels.array map (x => 255 - x), width, height)
+		new Matrix(pixels.array map (x => 255 - x), width, height)
 	})
 
 	def convolute(filter: Filter) = filter convolute this

@@ -6,12 +6,12 @@ import akka.actor._
 import akka.pattern.ask
 import akka.util.Timeout
 import grizzled.slf4j.Logging
-import vision.actors.ActorCommunication.{Images, ImageDetails, PrintFrequency}
+import vision.actors.ActorCommunication.{ImageDetails, Images, PrintFrequency}
 import vision.actors.MasterImageGenerator
 import vision.analysis.Operations._
 
 import scala.concurrent.Await
-import scala.util.{Try, Random}
+import scala.util.{Random, Try}
 
 object ImageGenerator extends Logging {
 	def generateAll(original: ImageWrapper, sample: ImageWrapper): Unit = {

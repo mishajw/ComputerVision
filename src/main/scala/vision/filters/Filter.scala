@@ -1,12 +1,11 @@
 package vision.filters
 
-import vision.filters.FilterFactory._
-import vision.util.ImageWrapper
+import vision.util.{ImageWrapper, Matrix}
 
 abstract class Filter {
 	def convolute(image: ImageWrapper): ImageWrapper
 
-	protected def convoluteSingle(image: ImageWrapper, mask: Mask): ImageWrapper = {
+	protected def convoluteSingle(image: ImageWrapper, mask: Matrix): ImageWrapper = {
 
 		val newImage = image.clone().asInstanceOf[ImageWrapper]
 

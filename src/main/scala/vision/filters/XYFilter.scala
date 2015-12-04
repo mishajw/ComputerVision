@@ -1,10 +1,9 @@
 package vision.filters
 
 import grizzled.slf4j.Logging
-import vision.filters.FilterFactory.Mask
-import vision.util.{Matrix, ImageWrapper}
+import vision.util.{ImageWrapper, Matrix}
 
-class XYFilter(xMask: Mask, yMask: Mask) extends Filter with Logging {
+class XYFilter(xMask: Matrix, yMask: Matrix) extends Filter with Logging {
 
 	override def convolute(image: ImageWrapper): ImageWrapper = {
 		debug("Convoluting in X direction")

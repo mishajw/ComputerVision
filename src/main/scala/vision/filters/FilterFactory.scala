@@ -11,8 +11,6 @@ import scala.io.Source
 
 object FilterFactory extends Logging {
 
-	type Mask = Matrix[Double]
-
 	lazy val json = new JSONObject(Source.fromFile("src/main/resources/json/filters.json").mkString)
 
 	/**
@@ -41,9 +39,9 @@ object FilterFactory extends Logging {
 	/**
 		* Get an array by it's string name
 		* @param s name
-		* @return Mask from JSON
+		* @return Matrix from JSON
 		*/
-	def getArrayByName(s: String): Mask = {
+	def getArrayByName(s: String): Matrix = {
 		var filter: ArrayBuffer[Double] = new ArrayBuffer[Double]()
 		var width = 0
 		var height = 0
@@ -60,10 +58,10 @@ object FilterFactory extends Logging {
 			}
 		}
 
-		new Mask(filter, width, height)
+		new Matrix(filter.toArray, width, height)
 	}
 
-	def getGaussianImage(size: Int, sd: Double): Mask = {
+	def getGaussianImage(size: Int, sd: Double): Matrix = {
 
 		val gaussian = breeze.stats.distributions.Gaussian(0, sd)
 		val step = 2d / size.asInstanceOf[Double]
@@ -73,10 +71,10 @@ object FilterFactory extends Logging {
 			filter = filter :+ gaussian.cdf(x) * gaussian.cdf(x)
 		}
 
-		new Mask(filter, size, size)
+		new Matrix(filter.toArray, size, size)
 	}
 
-	def getMeanFilter(size: Int): Mask = {
-		new Mask(ArrayBuffer.fill(size * size)(1 / (size.toDouble * size.toDouble)), size, size)
+	def getMeanFilter(size: Int): Matrix = {
+		new Matrix(Array.fill(size * size)(1 / (size.toDouble * size.toDouble)), size, size)
 	}
 }
