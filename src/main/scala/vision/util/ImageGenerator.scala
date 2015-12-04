@@ -1,26 +1,38 @@
 package vision.util
 
+import akka.actor.{Props, ActorSystem}
 import grizzled.slf4j.Logging
+import vision.actors.ActorCommunication.{PrintFrequency, ImageDetails}
+import vision.actors.MasterImageGenerator
 import vision.analysis.Operations._
-import vision.filters.{Filter, FilterFactory}
+import vision.filters.Filter
+
+import scala.util.Random
 
 object ImageGenerator extends Logging {
 	def generateAll(original: ImageWrapper, sample: ImageWrapper): Unit = {
-		var count = 0;
-		for (
-			t <- TRANSFORMATIONS;
-			nrf <- NOISE_REMOVAL; //.map(FilterFactory.getFilter);
-			edf <- EDGE_DETECTORS; //.map(FilterFactory.getFilter);
-			fin <- FINAL_THRESHOLDS) {
-			val image = generateImage(original, t, FilterFactory.getFilter(nrf), FilterFactory.getFilter(edf), fin)
+		info("Initialising image generation")
+		DB.reset()
+		var count = 0
+		var times: List[Long] = List()
 
-			val validity = image checkValidity sample
-			info(s"$t, $nrf, $edf, $fin")
-			info(f"${validity.sensitivity}%.2f, ${validity.specificity}%.2f")
-			count += 1
+		val system = ActorSystem("vision")
+		val master = system.actorOf(Props[MasterImageGenerator])
+
+		info("Starting image generation")
+		for (
+			t <- Random.shuffle(TRANSFORMATIONS);
+			nrf <- Random.shuffle(NOISE_REMOVAL); //.map(FilterFactory.getFilter);
+			edf <- Random.shuffle(EDGE_DETECTORS); //.map(FilterFactory.getFilter);
+			fin <- Random.shuffle(FINAL_THRESHOLDS)) {
+			master ! ImageDetails(original, sample, t, nrf, edf, fin)
 		}
 
-		info (count)
+		info("Printing results")
+		while (true) {
+			master ! PrintFrequency
+			Thread.sleep(1000)
+		}
 	}
 
 	def generateImage(original: ImageWrapper, transformation: ImageTransformation, nrf: Filter,

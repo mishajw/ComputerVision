@@ -13,7 +13,8 @@ libraryDependencies ++= Seq(
 	"org.scalanlp"               %% "breeze"              % "0.11.2",
 	"org.scalanlp"               %% "breeze-natives"      % "0.11.2",
 	"org.scalanlp"               %% "breeze-viz"          % "0.11.2",
-	"com.github.mauricio"        %% "postgresql-async"    % "0.2.18"
+	"org.mongodb"                %% "casbah"              % "3.0.0",
+	"com.typesafe.akka"          %% "akka-actor"          % "2.3.11"
 )
 
 resolvers ++= Seq(

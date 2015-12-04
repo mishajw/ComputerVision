@@ -18,6 +18,9 @@ class ImageWrapper(private val _pixels: Matrix[Int]) extends Cloneable with Logg
 		def specificity = tn / (tn + fp)
     def tpr = sensitivity
     def fpr = 1 - specificity
+		def dist = Math.sqrt(
+			Math.pow(1 - sensitivity, 2) +
+			Math.pow(1 - specificity, 2))
 	}
 
 	def this(path: String) {
