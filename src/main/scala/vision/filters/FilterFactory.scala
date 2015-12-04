@@ -15,26 +15,26 @@ object FilterFactory extends Logging {
 
 	lazy val json = new JSONObject(Source.fromFile("src/main/resources/json/filters.json").mkString)
 
-  /**
+	/**
 		* Get a filter by its type
 		* @param filterType The type of filter
 		* @return actual filter object
 		*/
 	def getFilter(filterType: FilterOperation) = filterType match {
-    case SimpleGradient => new EdgeDetectionFilter(
-        getArrayByName("simpleX"),
-        getArrayByName("simpleY"))
-		case Sobel => new EdgeDetectionFilter(
+		case SimpleGradient => new XYFilter(
+				getArrayByName("simpleX"),
+				getArrayByName("simpleY"))
+		case Sobel => new XYFilter(
 			getArrayByName("sobelX"),
 			getArrayByName("sobelY"))
-		case Roberts => new EdgeDetectionFilter(
+		case Roberts => new XYFilter(
 			getArrayByName("robertsX"),
 			getArrayByName("robertsY"))
-		case Prewitt => new EdgeDetectionFilter(
+		case Prewitt => new XYFilter(
 			getArrayByName("prewittX"),
 			getArrayByName("prewittY"))
-
-    case SimpleMean(size) => new SimpleFilter(getMeanFilter(size))
+		case Laplacian => new SimpleFilter(getArrayByName("laplacian"))
+		case SimpleMean(size) => new SimpleFilter(getMeanFilter(size))
 		case Gaussian(size, sd) => new SimpleFilter(getGaussianImage(size, sd))
 	}
 
@@ -65,18 +65,18 @@ object FilterFactory extends Logging {
 
 	def getGaussianImage(size: Int, sd: Double): Mask = {
 
-    val gaussian = breeze.stats.distributions.Gaussian(0, sd)
-    val step = 2d / size.asInstanceOf[Double]
-    var filter = new ArrayBuffer[Double]()
+		val gaussian = breeze.stats.distributions.Gaussian(0, sd)
+		val step = 2d / size.asInstanceOf[Double]
+		var filter = new ArrayBuffer[Double]()
 
-    for (x <- -1.0 to (1.0, step); y <- -1.0 to (1.0, step)) {
-      filter = filter :+ gaussian.cdf(x) * gaussian.cdf(x)
-    }
+		for (x <- -1.0 to (1.0, step); y <- -1.0 to (1.0, step)) {
+			filter = filter :+ gaussian.cdf(x) * gaussian.cdf(x)
+		}
 
-    new Mask(filter, size, size)
+		new Mask(filter, size, size)
 	}
 
-  def getMeanFilter(size: Int): Mask = {
-    new Mask(ArrayBuffer.fill(size * size)(1 / (size.toDouble * size.toDouble)), size, size)
-  }
+	def getMeanFilter(size: Int): Mask = {
+		new Mask(ArrayBuffer.fill(size * size)(1 / (size.toDouble * size.toDouble)), size, size)
+	}
 }

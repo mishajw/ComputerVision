@@ -16,6 +16,8 @@ class ImageWrapper(private val _pixels: Matrix[Int]) extends Cloneable with Logg
 	case class TestResults(var tp: Double, var tn: Double, var fp: Double, var fn: Double) {
 		def sensitivity = tp / (tp + fn)
 		def specificity = tn / (tn + fp)
+    def tpr = sensitivity
+    def fpr = 1 - specificity
 	}
 
 	def this(path: String) {

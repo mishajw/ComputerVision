@@ -3,7 +3,7 @@ package vision
 import javax.swing._
 
 import grizzled.slf4j.Logging
-import vision.analysis.Operations.{Roberts, Gaussian}
+import vision.analysis.Operations.{Gaussian, Roberts}
 import vision.filters.FilterFactory
 import vision.util.{ImageGenerator, ImageWrapper}
 
@@ -19,28 +19,23 @@ object ComputerVisionMain extends Logging {
 	def main(args: Array[String]): Unit = {
 		info("Starting...")
 
-		val imageName = images(2)
+		val imageName = images(0)
 
 		val startImage = new ImageWrapper(s"${imagesPath}orig/$imageName.bmp")
 		val sampleImage = new ImageWrapper(s"${imagesPath}sample-edges/$imageName Edges.bmp").flip.normalise
 
-//    for (i <- 3 to (21, 2)) {
-//      info(FilterFactory.getFilter(Gaussian(i, 1)))
-//    }
+//    val editedImage = startImage
+//      .applyThreshold(30)
+//      .convolute(FilterFactory.getFilter(SimpleMean(1)/*Gaussian(5, 1)*/))
+//      .convolute(FilterFactory.getFilter(Laplacian))
+//      .applyThreshold(50)
+//      .normalise
+//
+//    val results = editedImage.checkValidity(sampleImage)
+//    info("Hello??")
+//    info(s"${results.tpr}, ${results.fpr}")
 
-    ImageGenerator.generateAll(startImage, sampleImage)
-
-//		val editedImage = editImage(startImage, 3, 50, 50)
-//
-//		val results = editedImage checkValidity sampleImage
-//
-//
-//		info(s"Sensitivity: ${results.sensitivity}")
-//		info(s"Specificity: ${results.specificity}")
-//
-//		editedImage.display
-
-//		runTests(startImage, sampleImage)
+		ImageGenerator.generateAll(startImage, sampleImage)
 	}
 
 	def runTests(startImage: ImageWrapper, sampleImage: ImageWrapper) {
