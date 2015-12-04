@@ -15,4 +15,6 @@ object ActorCommunication {
 
 	case object PrintFrequency extends Message
 
+	case class PercentageDone(percent: Double) extends Message
+
 }

@@ -3,7 +3,7 @@ package vision.actors
 import akka.actor.{Actor, Props}
 import akka.routing.RoundRobinRouter
 import grizzled.slf4j.Logging
-import vision.actors.ActorCommunication.{Images, ImageDetails, ImageDone, PrintFrequency}
+import vision.actors.ActorCommunication._
 
 class MasterImageGenerator extends Actor with Logging {
 
@@ -37,9 +37,11 @@ class MasterImageGenerator extends Actor with Logging {
 
 					info("=== Stats ===")
 					info(f"Time passed: $timePassed")
-					info(f"Amount: $amountDone/$total (${amountDone.toDouble / total * 100}%.2f%%)")
+					val percent = amountDone.toDouble / total * 100
+					info(f"Amount: $amountDone/$total ($percent%.2f%%)")
 					info(f"Frequency: ${amountDone.toDouble / timePassed.toDouble}%.3f per sec")
 					info("")
+					sender ! percent
 			}
 	}
 }

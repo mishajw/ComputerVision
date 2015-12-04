@@ -1,12 +1,17 @@
 package vision.util
 
-import akka.actor.{ActorSystem, Props}
+import java.util.concurrent.TimeUnit
+
+import akka.actor._
+import akka.pattern.ask
+import akka.util.Timeout
 import grizzled.slf4j.Logging
 import vision.actors.ActorCommunication.{Images, ImageDetails, PrintFrequency}
 import vision.actors.MasterImageGenerator
 import vision.analysis.Operations._
 
-import scala.util.Random
+import scala.concurrent.Await
+import scala.util.{Try, Random}
 
 object ImageGenerator extends Logging {
 	def generateAll(original: ImageWrapper, sample: ImageWrapper): Unit = {
@@ -35,10 +40,16 @@ object ImageGenerator extends Logging {
 		info("Sending to master")
 		master ! Images(images)
 
+		var result = 0d
+		implicit val timeout = Timeout(500, TimeUnit.MILLISECONDS)
+
 		info("Printing results")
-		while (true) {
-			master ! PrintFrequency
+		while (result < 100) {
+			val future = master ? PrintFrequency
+			result = Try(Await.result(future, timeout.duration)).getOrElse(-1d).asInstanceOf[Double]
 			Thread.sleep(1000)
 		}
+
+		system.shutdown()
 	}
 }
