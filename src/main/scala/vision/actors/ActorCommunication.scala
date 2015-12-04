@@ -7,7 +7,7 @@ object ActorCommunication {
 
 	sealed trait Message
 
-	case class ImageDetails(original: ImageWrapper, sample: ImageWrapper, operations: Seq[Operation]) extends Message
+	case class ImageDetails(original: ImageWrapper, sample: ImageWrapper, operations: Array[Operation]) extends Message
 
 	case class Images(details: List[ImageDetails]) extends Message
 

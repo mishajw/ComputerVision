@@ -26,7 +26,7 @@ object ImageGenerator extends Logging {
 			nrf <- Random.shuffle(NOISE_REMOVAL); //.map(FilterFactory.getFilter);
 			edf <- Random.shuffle(EDGE_DETECTORS); //.map(FilterFactory.getFilter);
 			fin <- Random.shuffle(FINAL_THRESHOLDS)) {
-			images = images :+ ImageDetails(original, sample, Seq(transform, nrf, edf, NormaliseOperation, fin, FlipOperation))
+			images = images :+ ImageDetails(original, sample, Array(transform, nrf, edf, NormaliseOperation, fin, FlipOperation))
 
 		}
 

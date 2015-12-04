@@ -9,18 +9,20 @@ import vision.analysis.Operations._
 import vision.filters.{Filter, FilterFactory}
 import vision.util.{DB, ImageWrapper}
 
+import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
+import scala.util.control.Breaks._
 
 class WorkerImageGenerator extends Actor with Logging {
 
 	override def receive = {
 		case ImageDetails(original, sample, operations) =>
-			testImage(original, sample, operations: _*)
+			testImage(original, sample, operations)
 			sender() ! ImageDone
 	}
 
-	def testImage(original: ImageWrapper, sample: ImageWrapper, operations: Operation*): Unit = {
-		val image = generateImage(original, operations: _*)
+	def testImage(original: ImageWrapper, sample: ImageWrapper, operations: Array[Operation]): Unit = {
+		val image = generateImage(original, operations)
 		val validity = image checkValidity sample
 //		val fileName = "images/" + s"$t$nrf$edf$fin".hashCode + ".png"
 //		ImageIO.write(image.createImage, "png", new File(fileName))
@@ -31,33 +33,42 @@ class WorkerImageGenerator extends Actor with Logging {
 		DB.insertResults(validity.tpr, validity.fpr, validity.dist, operations: _*)
 	}
 
-	def generateImage(original: ImageWrapper, operations: Operation*): ImageWrapper = WorkerImageGenerator.transform(original, operations)
+	def generateImage(original: ImageWrapper, operations: Array[Operation]): ImageWrapper = WorkerImageGenerator.transform(original, operations)
 }
 
-object WorkerImageGenerator {
+object WorkerImageGenerator extends Logging {
 
-	val map = new ConcurrentHashMap[ListBuffer[Operation], ImageWrapper]()
+	val map = new mutable.HashMap[String, ImageWrapper]()
 
-	def transform(originalImage: ImageWrapper, operations: Seq[Operation]): ImageWrapper = {
-		var currentOperations = new ListBuffer[Operation]()
+	def transform(originalImage: ImageWrapper, operations: Array[Operation]): ImageWrapper = {
+		val workingSet = new mutable.Stack[Operation]()
+		val holdingSet = new mutable.Stack[Operation]()
 
-		operations.foldLeft(originalImage)((im, o) => {
-			// add new operation
-			currentOperations += o
+		workingSet.pushAll(operations)
 
-			// find existing operated image
-			var newIm = map.get(currentOperations)
+		// remove 1 by 1 until valid found
+		breakable {
+			while (workingSet.nonEmpty) {
 
-			if (newIm == null) {
-				newIm = apply(im, o)
-				map.put(currentOperations, newIm)
+				val hash = workingSet.mkString
+				val existing = map.get(hash)
+
+				if (existing != null)
+					break
+
+				holdingSet push (workingSet pop)
 			}
-
-			newIm
-		})
+		}
 
 
+		// apply all
+		var im = originalImage
+		while (holdingSet.nonEmpty)
+			im = apply(im, holdingSet pop)
+
+		im
 	}
+
 
 	def apply(im: ImageWrapper, operation: Operation): ImageWrapper = {
 
