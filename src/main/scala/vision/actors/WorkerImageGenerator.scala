@@ -38,7 +38,7 @@ class WorkerImageGenerator extends Actor with Logging {
 
 object WorkerImageGenerator extends Logging {
 
-	val map = new mutable.HashMap[String, ImageWrapper]()
+	val map = new ConcurrentHashMap[String, ImageWrapper]()
 
 	def transform(originalImage: ImageWrapper, operations: Array[Operation]): ImageWrapper = {
 		val workingSet = new mutable.Stack[Operation]()
@@ -48,15 +48,9 @@ object WorkerImageGenerator extends Logging {
 
 		// remove 1 by 1 until valid found
 		breakable {
-			while (workingSet.nonEmpty) {
-
-				val hash = workingSet.mkString
-				val existing = map.get(hash)
-
-				if (existing != null)
-					break
-
-				holdingSet push (workingSet pop)
+			while (workingSet.nonEmpty) Option(map.get(workingSet.mkString)) match {
+				case Some(x) => break
+				case None => holdingSet push (workingSet pop)
 			}
 		}
 
