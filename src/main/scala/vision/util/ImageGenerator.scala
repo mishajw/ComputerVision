@@ -5,9 +5,12 @@ import java.util.concurrent.TimeUnit
 import akka.actor._
 import akka.pattern.ask
 import akka.util.Timeout
+import com.mongodb.BasicDBList
+import com.mongodb.casbah.commons.MongoDBObject
 import grizzled.slf4j.Logging
 import vision.actors.ActorCommunication.{ImageDetails, Images, PrintFrequency}
 import vision.actors.MasterImageGenerator
+import vision.analysis.Operations
 import vision.analysis.Operations._
 
 import scala.concurrent.Await
@@ -51,5 +54,17 @@ object ImageGenerator extends Logging {
 		}
 
 		system.shutdown()
+	}
+
+	def regenerateFromDB(): Unit = {
+		val best = DB.getBestDistances(10)
+		best foreach (dbo => {
+			val dist = dbo.get("dist")
+			val operations = dbo.get("operations").asInstanceOf[BasicDBList].toArray.toList
+					.asInstanceOf[Seq[String]] map Operations.parse // lord forgive me
+
+			println(operations)
+		})
+
 	}
 }

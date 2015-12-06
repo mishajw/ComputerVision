@@ -21,5 +21,15 @@ object DB {
 		))
 	}
 
+	def getBestDistances(limit: Int) = {
+		resultsCollection
+				.find(MongoDBObject.empty, MongoDBObject("dist" -> 1, "operations" -> 1))
+				.sort(orderBy = MongoDBObject("dist" -> 1))
+				.skip(0)
+				.limit(limit)
+				.toList
+	}
+
+
 	def reset() = resultsCollection.remove("_id" $exists true)
 }

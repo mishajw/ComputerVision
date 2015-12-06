@@ -39,7 +39,8 @@ object ComputerVisionMain extends Logging {
 //			.applyThreshold(35)
 //			.display
 
-		ImageGenerator.generateAll(startImage, sampleImage)
+//		ImageGenerator.generateAll(startImage, sampleImage)
+		ImageGenerator.regenerateFromDB()
 	}
 
 	def runTests(startImage: ImageWrapper, sampleImage: ImageWrapper) {
