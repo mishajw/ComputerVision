@@ -48,7 +48,7 @@ object WorkerImageGenerator extends Logging {
 
 		// remove 1 by 1 until valid found
 		breakable {
-			while (workingSet.nonEmpty) (map.get(workingSet.mkString)) match {
+			while (workingSet.nonEmpty) map.get(workingSet.mkString) match {
 				case Some(x) => break
 				case None => holdingSet push (workingSet pop)
 			}
