@@ -1,6 +1,9 @@
 package vision.util
 
+import java.io
+import java.nio.file.{Files, Paths}
 import java.util.concurrent.TimeUnit
+import javax.imageio.ImageIO
 
 import akka.actor._
 import akka.pattern.ask
@@ -14,6 +17,7 @@ import vision.analysis.Operations
 import vision.analysis.Operations._
 
 import scala.concurrent.Await
+import scala.reflect.io.File
 import scala.util.{Random, Try}
 
 object ImageGenerator extends Logging {
@@ -56,16 +60,30 @@ object ImageGenerator extends Logging {
 		system.shutdown()
 	}
 
-	def regenerateFromDB(image: String): Unit = {
+	def regenerateFromDB(image: String, saveDirPath: String, deleteAll: Boolean): Unit = {
+		val saveDir = new io.File(saveDirPath)
+		if (deleteAll) {
+			val files = saveDir.listFiles
+			info(s"Deleting all ${files.length} old images")
+			files.foreach(_.delete)
+		}
+
+		if (!saveDir.exists)
+			saveDir.mkdir()
+
 		val best = DB.getBestDistances(10)
 		best foreach (dbo => {
 			val dist = dbo.get("dist")
 			val operations = dbo.get("operations").asInstanceOf[BasicDBList].toArray.toList
 					.asInstanceOf[Seq[String]] map Operations.parse // lord forgive me
 
-			operations
+			val im = operations
 					.foldLeft(new ImageWrapper(image))(
-						(im, op) => im.apply(op)).display
+						(im, op) => im.apply(op))
+
+			val fileName = dist.formatted("%.2f" + operations.mkString("_", "-", ""))
+			ImageIO.write(im.createImage, "bmp", Paths.get(saveDir.getPath, fileName).toFile)
+			info(s"Saved $fileName")
 		})
 
 
