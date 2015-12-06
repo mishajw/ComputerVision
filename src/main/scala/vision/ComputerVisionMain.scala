@@ -40,7 +40,7 @@ object ComputerVisionMain extends Logging {
 //			.display
 
 //		ImageGenerator.generateAll(startImage, sampleImage)
-		ImageGenerator.regenerateFromDB()
+		ImageGenerator.regenerateFromDB("src/main/resources/images/orig/10905 JL.bmp")
 	}
 
 	def runTests(startImage: ImageWrapper, sampleImage: ImageWrapper) {

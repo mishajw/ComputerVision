@@ -56,15 +56,18 @@ object ImageGenerator extends Logging {
 		system.shutdown()
 	}
 
-	def regenerateFromDB(): Unit = {
+	def regenerateFromDB(image: String): Unit = {
 		val best = DB.getBestDistances(10)
 		best foreach (dbo => {
 			val dist = dbo.get("dist")
 			val operations = dbo.get("operations").asInstanceOf[BasicDBList].toArray.toList
 					.asInstanceOf[Seq[String]] map Operations.parse // lord forgive me
 
-			println(operations)
+			operations
+					.foldLeft(new ImageWrapper(image))(
+						(im, op) => im.apply(op)).display
 		})
+
 
 	}
 }
