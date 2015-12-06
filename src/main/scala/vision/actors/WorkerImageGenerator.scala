@@ -58,25 +58,8 @@ object WorkerImageGenerator extends Logging {
 		// apply all
 		var im = originalImage
 		while (holdingSet.nonEmpty)
-			im = apply(im, holdingSet pop)
+			im = im.apply(holdingSet pop)
 
 		im
 	}
-
-
-	def apply(im: ImageWrapper, operation: Operation): ImageWrapper = {
-
-		operation match {
-			case filter: FilterOperation =>
-				im.convolute(FilterFactory.getFilter(filter))
-			case ThresholdOperation(n) => im.applyThreshold(n)
-			case FlipOperation => im.flip
-			case NormaliseOperation => im.normalise
-			case _ => im
-		}
-
-
-	}
-
-
 }

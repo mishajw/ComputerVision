@@ -7,7 +7,8 @@ import javax.imageio.ImageIO
 import javax.swing.{ImageIcon, JLabel, JOptionPane}
 
 import grizzled.slf4j.Logging
-import vision.filters.Filter
+import vision.analysis.Operations._
+import vision.filters.{FilterFactory, Filter}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -116,5 +117,17 @@ class ImageWrapper(private val _pixels: Matrix) extends Cloneable with Logging {
 		}
 
 		results
+	}
+
+
+	def apply(operation: Operation): ImageWrapper = {
+		operation match {
+			case filter: FilterOperation =>
+				convolute(FilterFactory.getFilter(filter))
+			case ThresholdOperation(n) => applyThreshold(n)
+			case FlipOperation => flip
+			case NormaliseOperation => normalise
+			case _ => this
+		}
 	}
 }
