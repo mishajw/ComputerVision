@@ -68,7 +68,7 @@ object FilterFactory extends Logging {
 		var filter = new ArrayBuffer[Double]()
 
 		for (x <- -1.0 to (1.0, step); y <- -1.0 to (1.0, step)) {
-			filter = filter :+ gaussian.cdf(x) * gaussian.cdf(x)
+			filter = filter :+ gaussian.cdf(x) * gaussian.cdf(y)
 		}
 
 		new Matrix(filter.toArray, size, size)
