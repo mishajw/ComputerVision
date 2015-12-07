@@ -15,7 +15,7 @@ object Operations {
 	val NOISE_REMOVAL = {
 		var x: List[NoiseRemoval] = List()
 
-		for (size <- 2 to 7; sd <- 1d to 4d by 1d)
+		for (size <- 3 to 7 by 2; sd <- 1d to 4d by 1d)
 			x = x :+ Gaussian(size, sd)
 		for (size <- 1 to 7 by 2)
 			x = x :+ SimpleMean(size)
