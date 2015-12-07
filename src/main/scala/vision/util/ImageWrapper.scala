@@ -3,6 +3,7 @@ package vision.util
 import java.awt.image.BufferedImage
 import java.io.{File, FileNotFoundException}
 import java.net.{MalformedURLException, URL}
+import java.nio.file.Paths
 import javax.imageio.ImageIO
 import javax.swing.{ImageIcon, JLabel, JOptionPane}
 
@@ -67,6 +68,17 @@ class ImageWrapper(private val _pixels: Matrix) extends Cloneable with Logging {
 
 	def display: ImageWrapper = {
 		JOptionPane.showMessageDialog(null, new JLabel(new ImageIcon(createImage)))
+		this
+	}
+
+	def save(directory: File, name: String): ImageWrapper = save(directory, "bmp", name)
+
+	def save(directory: File, ext: String, name: String):ImageWrapper = {
+		if (!directory.exists())
+			directory.mkdir()
+		
+		ImageIO.write(createImage, ext, Paths.get(directory.getAbsolutePath, name).toFile)
+		debug(s"Saved file '$name'")
 		this
 	}
 

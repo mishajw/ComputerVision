@@ -82,7 +82,7 @@ object ImageGenerator extends Logging {
 						(im, op) => im.apply(op))
 
 			val fileName = dist.formatted("%.2f" + operations.mkString("_", "-", ""))
-			ImageIO.write(im.createImage, "bmp", Paths.get(saveDir.getPath, fileName).toFile)
+			im.save(saveDir, fileName)
 			info(s"Saved $fileName")
 		})
 
