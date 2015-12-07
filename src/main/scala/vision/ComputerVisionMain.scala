@@ -3,12 +3,12 @@ package vision
 import javax.swing._
 
 import grizzled.slf4j.Logging
-import vision.analysis.Operations.{Gaussian, Roberts}
+import vision.analysis.Operations._
 import vision.filters.FilterFactory
-import vision.util.{ImageGenerator, ImageWrapper}
+import vision.util.ImageWrapper
 
 object ComputerVisionMain extends Logging {
-	private val imagesPath = "src/main/resources/images/"
+	private val imagesPath = "src/main/resources/images"
 
 	val defaultGauss = 3
 	val defaultFirstThreshold = 70
@@ -18,30 +18,15 @@ object ComputerVisionMain extends Logging {
 
 	def main(args: Array[String]): Unit = {
 		info("Starting...")
-
-		val imageName = images(0)
-
-		val startImage = new ImageWrapper(s"${imagesPath}orig/$imageName.bmp")
-		val sampleImage = new ImageWrapper(s"${imagesPath}sample-edges/$imageName Edges.bmp").flip.normalise
-
-//    val editedImage = startImage
-//      .applyThreshold(30)
-//      .convolute(FilterFactory.getFilter(SimpleMean(1)/*Gaussian(5, 1)*/))
-//      .convolute(FilterFactory.getFilter(Laplacian))
-//      .applyThreshold(50)
-//      .normalise
-//
-//    val results = editedImage.checkValidity(sampleImage)
-//    info("Hello??")
-//    info(s"${results.tpr}, ${results.fpr}")
-
-//		startImage
-//			.applyThreshold(35)
-//			.display
-
-//		ImageGenerator.generateAll(startImage, sampleImage)
-		ImageGenerator.regenerateFromDB("src/main/resources/images/orig/10905 JL.bmp", "src/main/resources/images/generated", true)
 	}
+
+	def getOriginalPath(index: Int) = s"$imagesPath/orig/${images(index)}.bmp"
+
+	def getSamplePath(index: Int) = s"$imagesPath/sample-edges/${images(index)} Edges.bmp"
+
+	def getOriginalImage(index: Int) = new ImageWrapper(getOriginalPath(index))
+
+	def getSampleImage(index: Int) = new ImageWrapper(getSamplePath(index))
 
 	def runTests(startImage: ImageWrapper, sampleImage: ImageWrapper) {
 
