@@ -77,9 +77,7 @@ object ImageGenerator extends Logging {
 			val operations = dbo.get("operations").asInstanceOf[BasicDBList].toArray.toList
 					.asInstanceOf[Seq[String]] map Operations.parse // lord forgive me
 
-			val im = operations
-					.foldLeft(new ImageWrapper(image))(
-						(im, op) => im.apply(op))
+			val im = new ImageWrapper(image).apply(operations)
 
 			val fileName = dist.formatted("%.2f" + operations.mkString("_", "-", ""))
 			im.save(saveDir, fileName)

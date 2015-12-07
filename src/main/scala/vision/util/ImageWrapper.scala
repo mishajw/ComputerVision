@@ -145,4 +145,6 @@ class ImageWrapper(private val _pixels: Matrix) extends Cloneable with Logging {
 			case _ => this
 		}
 	}
+
+	def apply(operations: Seq[Operation]): ImageWrapper = operations.foldLeft(this)((im, op) => im.apply(op))
 }

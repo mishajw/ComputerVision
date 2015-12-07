@@ -25,10 +25,6 @@ object ComputerVisionMain extends Logging {
 		val sample = getSampleImage(index)
 
 		// apply ops
-//		val image = operations.foldLeft(getOriginalImage(index))((im, o) => {
-//			println(s"done $o")
-//			im.apply(o)
-//		})
 		val image = getOriginalImage(index)
 
 		// compare and display
