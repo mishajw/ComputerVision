@@ -18,6 +18,33 @@ object ComputerVisionMain extends Logging {
 
 	def main(args: Array[String]): Unit = {
 		info("Starting...")
+
+		val operations = Seq(ThresholdOperation(35), Gaussian(3, 1d), Sobel, NormaliseOperation, ThresholdOperation(100), FlipOperation)
+
+		val index = 0
+		val sample = getSampleImage(index)
+
+		// apply ops
+//		val image = operations.foldLeft(getOriginalImage(index))((im, o) => {
+//			println(s"done $o")
+//			im.apply(o)
+//		})
+		val image = getOriginalImage(index)
+
+		// compare and display
+		// todo
+		val tests = image.checkValidity(sample)
+		println(tests)
+
+//		image.display
+//		sample.display
+
+
+
+
+
+
+
 	}
 
 	def getOriginalPath(index: Int) = s"$imagesPath/orig/${images(index)}.bmp"
@@ -28,45 +55,6 @@ object ComputerVisionMain extends Logging {
 
 	def getSampleImage(index: Int) = new ImageWrapper(getSamplePath(index))
 
-	def runTests(startImage: ImageWrapper, sampleImage: ImageWrapper) {
-
-		val perfectGauss = toGauss(Analyser.analyse(startImage, sampleImage, (startImage: ImageWrapper, i: Double) => {
-			editImage(startImage, toGauss(i), defaultFirstThreshold, defaultSecondThreshold)
-		}))
-
-		val perfectFirstThreshold = toThreshold(Analyser.analyse(startImage, sampleImage, (startImage: ImageWrapper, i: Double) => {
-			editImage(startImage, defaultGauss, toThreshold(i), defaultSecondThreshold)
-		}))
-
-		val perfectSecondThreshold = toThreshold(Analyser.analyse(startImage, sampleImage, (startImage: ImageWrapper, i: Double) => {
-			editImage(startImage, defaultGauss, defaultFirstThreshold, toThreshold(i))
-		}))
-
-		info(s"Gauss: $perfectGauss, 1st: $perfectFirstThreshold, 2nd: $perfectSecondThreshold")
-
-		val perfectImage = editImage(startImage, perfectGauss, perfectFirstThreshold, perfectSecondThreshold)
-		val results = perfectImage checkValidity sampleImage
-
-		info(s"Perfect values: $perfectGauss, $perfectFirstThreshold, $perfectSecondThreshold")
-
-		info(s"Sensitivity: ${results.sensitivity}")
-		info(s"Specificity: ${results.specificity}")
-
-		perfectImage.display
-		sampleImage.display
-	}
-
-	def editImage(startImage: ImageWrapper, gaussSize: Int, firstThreshold: Int, secondThreshold: Int): ImageWrapper = {
-		val edgeDetection = FilterFactory.getFilter(Roberts)
-		val smoothing = FilterFactory.getFilter(Gaussian(gaussSize, 1))
-
-		startImage
-			.convolute(smoothing)
-			.normalise
-			.applyThreshold(firstThreshold)
-			.convolute(edgeDetection)
-			.applyThreshold(secondThreshold)
-	}
 
 	def toGauss(i: Double) = (i * 15).asInstanceOf[Int] + 1
 

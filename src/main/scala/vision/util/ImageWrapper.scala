@@ -9,20 +9,23 @@ import javax.swing.{ImageIcon, JLabel, JOptionPane}
 
 import grizzled.slf4j.Logging
 import vision.analysis.Operations._
-import vision.filters.{FilterFactory, Filter}
-
-import scala.collection.mutable.ArrayBuffer
+import vision.filters.{Filter, FilterFactory}
 
 class ImageWrapper(private val _pixels: Matrix) extends Cloneable with Logging {
 
 	case class TestResults(var tp: Double, var tn: Double, var fp: Double, var fn: Double) {
 		def sensitivity = tp / (tp + fn)
 		def specificity = tn / (tn + fp)
-    def tpr = sensitivity
-    def fpr = 1 - specificity
+
+		def tpr = sensitivity
+
+		def fpr = 1 - specificity
 		def dist = Math.sqrt(
 			Math.pow(1 - sensitivity, 2) +
 			Math.pow(1 - specificity, 2))
+
+
+		override def toString = s"TestResults(sensitivity=$sensitivity, specificity=$specificity, tpr=$tpr, fpr=$fpr, dist=$dist)"
 	}
 
 	def this(path: String) {
