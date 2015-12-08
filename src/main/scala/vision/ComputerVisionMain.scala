@@ -25,17 +25,14 @@ object ComputerVisionMain extends Logging {
 		val sample = getSampleImage(index)
 
 		// pre operations
-		val preops = Seq(ThresholdOperation(34))
+		val preops = Seq()
 
 		// vary operation
-		val sizes = 3 to 21 by 2
-		val sds = 1d to 1d by 1d
-		val possibles = for (sz <- sizes; sd <- sds) yield (sz, sd)
-
-		val varyOps = possibles map (pair => Gaussian(pair._1, pair._2))
+		val thresholds = 0 to 100 by 5
+		val varyOps = thresholds map ThresholdOperation
 
 		// post operations
-		val postOps = operations.slice(2, operations.size)
+		val postOps = operations.slice(1, operations.size)
 
 		// compare and display
 		val image = getOriginalImage(index).apply(preops)
