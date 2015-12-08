@@ -24,13 +24,22 @@ object ComputerVisionMain extends Logging {
 		val index = 0
 		val sample = getSampleImage(index)
 
-		val image = getOriginalImage(index)
+		// pre operations
+		val preops = Seq(ThresholdOperation(34))
+
+		// vary operation
+		val sizes = 3 to 21 by 2
+		val sds = 1d to 1d by 1d
+		val possibles = for (sz <- sizes; sd <- sds) yield (sz, sd)
+
+		val varyOps = possibles map (pair => Gaussian(pair._1, pair._2))
+
+		// post operations
+		val postOps = operations.slice(2, operations.size)
 
 		// compare and display
-		val varyOps = 10 to 100 by 2 map ThresholdOperation
-		val postOps = operations.slice(1, operations.size)
-		val results = Analyser.vary(image, sample, varyOps, postOps)
-		Analyser.drawResults(results)
+		val image = getOriginalImage(index).apply(preops)
+		Analyser.drawResults(Analyser.vary(image, sample, varyOps, postOps))
 	}
 
 	def getOriginalPath(index: Int) = s"$imagesPath/orig/${images(index)}.bmp"
