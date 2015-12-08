@@ -21,22 +21,28 @@ object ComputerVisionMain extends Logging {
 
 		val operations = Seq(ThresholdOperation(35), Gaussian(3, 1d), Sobel, NormaliseOperation, ThresholdOperation(100), FlipOperation)
 
-		val index = 0
-		val sample = getSampleImage(index)
+		val results = images.indices map (index => {
+			info(s"Beginning image $index")
 
-		// pre operations
-		val preops = Seq()
+			val sample = getSampleImage(index)
 
-		// vary operation
-		val thresholds = 0 to 100 by 5
-		val varyOps = thresholds map ThresholdOperation
+			// pre operations
+			val preops = Seq()
 
-		// post operations
-		val postOps = operations.slice(1, operations.size)
+			// vary operation
+			val thresholds = 0 to 100 by 20
+			val varyOps = thresholds map ThresholdOperation
 
-		// compare and display
-		val image = getOriginalImage(index).apply(preops)
-		Analyser.drawResults(Analyser.vary(image, sample, varyOps, postOps))
+			// post operations
+			val postOps = operations.slice(1, operations.size)
+
+			// compare and display
+			val image = getOriginalImage(index).apply(preops)
+
+			(images(index), Analyser.vary(image, sample, varyOps, postOps))
+		})
+
+		Analyser.drawResults(results.toMap, "Thresholding")
 	}
 
 	def getOriginalPath(index: Int) = s"$imagesPath/orig/${images(index)}.bmp"

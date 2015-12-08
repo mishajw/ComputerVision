@@ -1,5 +1,7 @@
 package vision
 
+import java.awt.Dimension
+
 import breeze.linalg.DenseVector
 import breeze.plot._
 import grizzled.slf4j.Logging
@@ -35,21 +37,37 @@ object Analyser extends Logging {
 		results
 	}
 
-	def drawResults(results: Seq[(Operation, TestResults)]) = {
+	/**
+		* Graphs the given results
+		*
+		* @param allResults Map of legend label -> results
+		* @param title Plot title
+		* @param size Size of plot in pixels
+		*/
+	def drawResults(allResults: Map[String, Seq[(Operation, TestResults)]], title: String, size: Int = 800) = {
 
-		val f = Figure()
+		val f = Figure(title)
 		val p = f.subplot(0)
 
-		val x = DenseVector(results.map(_._2.fpr).toArray)
-		val y = DenseVector(results.map(_._2.tpr).toArray)
+		f.width = size
+		f.height = size
 
 		p.xlabel = "FPR (1 - specificity)"
 		p.ylabel = "TPR (sensitivity)"
 		p.setXAxisDecimalTickUnits()
 		p.setYAxisDecimalTickUnits()
+		p.legend = true
+		p.title = title
 
-		p += plot(x, y, shapes = true, labels = (i) => Operations.prettyString(results(i)._1),
-			tips = (i) => results(i)._1.toString + " with distance from optimal of " + results(i)._2.dist)
+		allResults foreach (pair => {
+			val (label, results) = pair
+
+			val x = DenseVector(results.map(_._2.fpr).toArray)
+			val y = DenseVector(results.map(_._2.tpr).toArray)
+
+			p += plot(x, y, shapes = true, name = label, labels = (i) => Operations.prettyString(results(i)._1),
+				tips = (i) => results(i)._1.toString + " with distance from optimal of " + results(i)._2.dist)
+		})
 
 	}
 }
