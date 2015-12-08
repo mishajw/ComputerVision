@@ -44,7 +44,7 @@ object Analyser extends Logging {
 		* @param title Plot title
 		* @param size Size of plot in pixels
 		*/
-	def drawResults(allResults: Map[String, Seq[(Operation, TestResults)]], title: String, size: Int = 800) = {
+	def drawResults(allResults: Map[String, Seq[(Operation, TestResults)]], title: String, size: Int = 800, saveFile: String = null) = {
 
 		val f = Figure(title)
 		val p = f.subplot(0)
@@ -68,6 +68,11 @@ object Analyser extends Logging {
 			p += plot(x, y, shapes = true, name = label, labels = (i) => Operations.prettyString(results(i)._1),
 				tips = (i) => results(i)._1.toString + " with distance from optimal of " + results(i)._2.dist)
 		})
+
+		if (saveFile != null) {
+			f.saveas(s"src/main/resources/graphs/$saveFile.png")
+			info(s"Saved graph to $saveFile")
+		}
 
 	}
 }

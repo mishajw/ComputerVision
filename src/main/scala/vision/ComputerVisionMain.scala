@@ -42,7 +42,7 @@ object ComputerVisionMain extends Logging {
 			(images(index), Analyser.vary(image, sample, varyOps, postOps))
 		})
 
-		Analyser.drawResults(results.toMap, "Thresholding")
+		Analyser.drawResults(results.toMap, "Thresholding", saveFile = "initial_thresholds")
 	}
 
 	def getOriginalPath(index: Int) = s"$imagesPath/orig/${images(index)}.bmp"
