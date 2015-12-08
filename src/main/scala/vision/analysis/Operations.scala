@@ -1,19 +1,18 @@
 package vision.analysis
 
-import java.util
-
-import scala.util.Try
-
 object Operations {
 	def prettyString(operation: Operation): String = {
 		operation match {
-			case NormaliseOperation => "Normalise"
-			case FlipOperation => "Flip"
-			case ThresholdOperation(x) => s"Threshold of $x"
-			case SimpleMean(x) => s"Simple mean of size $x"
-			case Gaussian(x, sd) => s"First order Gaussian of size $x and SD $sd"
-			case SimpleGradient => s"Simple gradient"
-			case s => s.toString
+			case NormaliseOperation => "NORM"
+			case FlipOperation => "FLIP"
+			case ThresholdOperation(x) => s"THR($x)"
+			case SimpleMean(x) => s"$x SM"
+			case Gaussian(x, sd) => s"FOG($x, $sd)"
+			case SimpleGradient => "SG"
+			case Sobel => "SBL"
+			case Roberts => "RBTS"
+			case Prewitt => "PRWT"
+			case Laplacian => "LPLCN"
 		}
 	}
 
