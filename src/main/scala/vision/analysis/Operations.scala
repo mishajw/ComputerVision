@@ -5,6 +5,18 @@ import java.util
 import scala.util.Try
 
 object Operations {
+	def prettyString(operation: Operation): String = {
+		operation match {
+			case NormaliseOperation => "Normalise"
+			case FlipOperation => "Flip"
+			case ThresholdOperation(x) => s"Threshold of $x"
+			case SimpleMean(x) => s"Simple mean of size $x"
+			case Gaussian(x, sd) => s"First order Gaussian of size $x and SD $sd"
+			case SimpleGradient => s"Simple gradient"
+			case s => s.toString
+		}
+	}
+
 
 	private val STANDARD_THRESHOLDS = 20 to 100 by 10
 
@@ -23,7 +35,7 @@ object Operations {
 		x
 	}
 
-	val EDGE_DETECTORS = Seq(SimpleGradient, Sobel, Roberts, /*Prewitt, */Laplacian)
+	val EDGE_DETECTORS = Seq(SimpleGradient, Sobel, Roberts, /*Prewitt, */ Laplacian)
 
 	val FINAL_THRESHOLDS = STANDARD_THRESHOLDS map ThresholdOperation
 
@@ -83,8 +95,8 @@ object Operations {
 
 		// parse params
 		val allArgs = ARGS_REGEX.findAllMatchIn(s)
-				.toList
-				.map(_.group(0))
+			.toList
+			.map(_.group(0))
 
 		name match {
 			case "ThresholdOperation" => return ThresholdOperation(allArgs.head.toInt)
