@@ -44,7 +44,52 @@ object Analyser extends Logging {
 		* @param title Plot title
 		* @param size Size of plot in pixels
 		*/
-	def drawResults(allResults: Map[String, Seq[(Operation, TestResults)]], title: String, size: Int = 800, saveFile: String = null) = {
+	def drawVariedResults(allResults: Map[String, Seq[(Operation, TestResults)]], limit: Boolean = false, title: String = "", size: Int = 800, saveFile: String = null) = {
+
+		val f = Figure(title)
+
+		val p = f.subplot(0)
+
+		f.width = size
+		f.height = size
+
+		p.xlabel = "FPR (1 - specificity)"
+		p.ylabel = "TPR (sensitivity)"
+		p.setXAxisDecimalTickUnits()
+		p.setYAxisDecimalTickUnits()
+		p.legend = true
+		p.title = title
+
+		if (limit) {
+			p.xlim(0d, 1d)
+			p.ylim(0d, 1d)
+		}
+
+		allResults foreach (pair => {
+			val (label, results) = pair
+
+			val x = DenseVector(results.map(_._2.fpr).toArray)
+			val y = DenseVector(results.map(_._2.tpr).toArray)
+
+			p += plot(x, y, shapes = true, name = label, labels = (i) => Operations.prettyString(results(i)._1),
+				tips = (i) => results(i)._1.toString + " with distance from optimal of " + results(i)._2.dist)
+		})
+
+		if (saveFile != null) {
+			f.saveas(s"src/main/resources/graphs/$saveFile.png")
+			info(s"Saved graph to $saveFile")
+		}
+
+	}
+
+	/**
+		* Graphs the given results
+		*
+		* @param results legend label -> results
+		* @param title Plot title
+		* @param size Size of plot in pixels
+		*/
+	def drawResults(results: Seq[(String, TestResults)], limit: Boolean = false, title: String = "", size: Int = 800, saveFile: String = null) = {
 
 		val f = Figure(title)
 		val p = f.subplot(0)
@@ -59,14 +104,19 @@ object Analyser extends Logging {
 		p.legend = true
 		p.title = title
 
-		allResults foreach (pair => {
-			val (label, results) = pair
+		if (limit) {
+			p.xlim(0d, 1d)
+			p.ylim(0d, 1d)
+		}
 
-			val x = DenseVector(results.map(_._2.fpr).toArray)
-			val y = DenseVector(results.map(_._2.tpr).toArray)
+		results foreach (pair => {
+			val (label , testResults) = pair
 
-			p += plot(x, y, shapes = true, name = label, labels = (i) => Operations.prettyString(results(i)._1),
-				tips = (i) => results(i)._1.toString + " with distance from optimal of " + results(i)._2.dist)
+			val x = DenseVector(testResults.fpr)
+			val y = DenseVector(testResults.tpr)
+
+			p += plot(x, y, shapes = true, name = label, labels = (i) => label,
+				tips = (i) => "Distance from optimal:" + testResults.dist)
 		})
 
 		if (saveFile != null) {

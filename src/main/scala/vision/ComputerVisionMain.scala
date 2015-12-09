@@ -4,6 +4,7 @@ import javax.swing._
 
 import grizzled.slf4j.Logging
 import vision.analysis.Operations._
+import vision.analysis.TestResults
 import vision.filters.FilterFactory
 import vision.util.ImageWrapper
 
@@ -15,34 +16,42 @@ object ComputerVisionMain extends Logging {
 	val defaultSecondThreshold = 30
 
 	val images = Seq("10905 JL", "43590 AM", "9343 AM")
+	val thresholds = Map(0 -> 34, 1 -> 10, 2 -> 30)
 
 	def main(args: Array[String]): Unit = {
 		info("Starting...")
 
-		val operations = Seq(ThresholdOperation(35), Gaussian(3, 1d), Sobel, NormaliseOperation, ThresholdOperation(100), FlipOperation)
+		noiseRemoval()
+	}
 
-		val results = images.indices map (index => {
-			info(s"Beginning image $index")
+	/**
+		* Shows necessity of noise removal
+		*/
+	def noiseRemoval(): Unit = {
+		var results = Seq.empty[(String, TestResults)]
+		for (pair <- thresholds) {
+			val (index, threshold) = pair
 
-			val sample = getSampleImage(index)
+			val orig = getOriginalImage(index)
+			val sample = getSampleImage(index).flip
 
-			// pre operations
-			val preops = Seq()
+			val sans = orig.applyThreshold(threshold).apply(Sobel).normalise.applyThreshold(20)
+			info("Without noise removal")
+			val withoutRes = sans.checkValidity(sample)
+			results = results :+(images(index) + " without", withoutRes)
+			info(withoutRes)
 
-			// vary operation
-			val thresholds = 0 to 100 by 20
-			val varyOps = thresholds map ThresholdOperation
+			val avec = orig.applyThreshold(threshold).apply(SimpleMean(3)).apply(Sobel).normalise.applyThreshold(20)
+			val withRes = avec.checkValidity(sample)
+			info("With noise removal")
+			info(withRes)
+			results = results :+(images(index) + " with", withRes)
 
-			// post operations
-			val postOps = operations.slice(1, operations.size)
+			//			sans.display
+			//			avec.display
+		}
 
-			// compare and display
-			val image = getOriginalImage(index).apply(preops)
-
-			(images(index), Analyser.vary(image, sample, varyOps, postOps))
-		})
-
-		Analyser.drawResults(results.toMap, "Thresholding", saveFile = "initial_thresholds")
+		Analyser.drawResults(results, title = "The effect of noise removal", limit = true, saveFile = "noise_removal_all")
 	}
 
 	def getOriginalPath(index: Int) = s"$imagesPath/orig/${images(index)}.bmp"
