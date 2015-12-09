@@ -100,7 +100,7 @@ class ImageWrapper(private val _pixels: Matrix) extends Cloneable with Logging {
 		new Matrix(normalisedArray, width, height)
 	})
 
-	def applyThreshold(threshold: Int) = new ImageWrapper({
+	def threshold(threshold: Int) = new ImageWrapper({
 		if (threshold < 0 || threshold > 255)
 		throw new IllegalArgumentException("Invalid threshold")
 
@@ -114,7 +114,7 @@ class ImageWrapper(private val _pixels: Matrix) extends Cloneable with Logging {
 
 	def convolute(filter: Filter) = filter convolute this
 
-	def checkValidity(sample: ImageWrapper): TestResults = {
+	def doRocAnalysis(sample: ImageWrapper): TestResults = {
 		val results = new TestResults(0, 0, 0, 0)
 
 		val maxWidth = width max sample.width
@@ -134,12 +134,11 @@ class ImageWrapper(private val _pixels: Matrix) extends Cloneable with Logging {
 		results
 	}
 
-
 	def apply(operation: Operation): ImageWrapper = {
 		operation match {
 			case filter: FilterOperation =>
 				convolute(FilterFactory.getFilter(filter))
-			case ThresholdOperation(n) => applyThreshold(n)
+			case ThresholdOperation(n) => threshold(n)
 			case FlipOperation => flip
 			case NormaliseOperation => normalise
 			case _ => this

@@ -23,7 +23,7 @@ class WorkerImageGenerator extends Actor with Logging {
 
 	def testImage(original: ImageWrapper, sample: ImageWrapper, operations: Array[Operation]): Unit = {
 		val image = generateImage(original, operations)
-		val validity = image checkValidity sample
+		val validity = image doRocAnalysis sample
 //		val fileName = "images/" + s"$t$nrf$edf$fin".hashCode + ".png"
 //		ImageIO.write(image.createImage, "png", new File(fileName))
 //

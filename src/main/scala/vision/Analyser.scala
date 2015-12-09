@@ -30,7 +30,7 @@ object Analyser extends Logging {
 			val newImage = postOperations.foldLeft(orig.apply(op))((im, o) => im.apply(o))
 
 			// analyse
-			val tr = newImage.checkValidity(sample)
+			val tr = newImage.doRocAnalysis(sample)
 			results = results :+(op, tr)
 		}
 

@@ -33,14 +33,14 @@ object ComputerVisionMain extends Logging {
 			val orig = getOriginalImage(index)
 			val sample = getSampleImage(index).flip
 
-			val sans = orig.applyThreshold(threshold).apply(Sobel).normalise.applyThreshold(20)
+			val sans = orig.threshold(threshold).apply(Sobel).normalise.threshold(20)
 			info("Without noise removal")
-			val withoutRes = sans.checkValidity(sample)
+			val withoutRes = sans.doRocAnalysis(sample)
 			results = results :+(images(index) + " without", withoutRes)
 			info(withoutRes)
 
-			val avec = orig.applyThreshold(threshold).apply(SimpleMean(3)).apply(Sobel).normalise.applyThreshold(20)
-			val withRes = avec.checkValidity(sample)
+			val avec = orig.threshold(threshold).apply(SimpleMean(3)).apply(Sobel).normalise.threshold(20)
+			val withRes = avec.doRocAnalysis(sample)
 			info("With noise removal")
 			info(withRes)
 			results = results :+(images(index) + " with", withRes)
@@ -52,13 +52,13 @@ object ComputerVisionMain extends Logging {
 	def simpleEdgeDetectionFilterTests(): Unit = {
 		for (i <- 0 until 3) {
 			val image = getOriginalImage(i)
-				.applyThreshold(thresholds(i))
+				.threshold(thresholds(i))
 				.apply(Gaussian(5, 1))
 
 			val sample = getSampleImage(i).flip
 
 			val results = for (edf <- EDGE_DETECTORS)
-				yield (edf.toString, image.apply(edf).applyThreshold(10).checkValidity(sample))
+				yield (edf.toString, image.apply(edf).threshold(10).doRocAnalysis(sample))
 
 			Analyser.drawResults(results, title = "The effects of different Edge Detection filters"/*, saveFile = s"$i-edge_detect_all"*/)
 		}
