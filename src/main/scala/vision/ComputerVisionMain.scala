@@ -15,7 +15,7 @@ object ComputerVisionMain extends Logging {
 	val defaultSecondThreshold = 30
 
 	val images = Seq("10905 JL", "43590 AM", "9343 AM")
-	val thresholds = Map(0 -> 34, 1 -> 10, 2 -> 30)
+	val thresholds = Seq(34, 10, 30)
 
 	def main(args: Array[String]): Unit = {
 		info("Starting...")
