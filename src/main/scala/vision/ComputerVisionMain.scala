@@ -68,9 +68,9 @@ object ComputerVisionMain extends Logging {
 
 	def getSamplePath(index: Int) = s"$imagesPath/sample-edges/${images(index)} Edges.bmp"
 
-	def getOriginalImage(index: Int) = new ImageWrapper(getOriginalPath(index))
+	def getOriginalImage(index: Int, greenElement: Boolean = false) = new ImageWrapper(getOriginalPath(index), greenElement)
 
-	def getSampleImage(index: Int) = new ImageWrapper(getSamplePath(index))
+	def getSampleImage(index: Int, greenElement: Boolean = false) = new ImageWrapper(getSamplePath(index), greenElement)
 
 	def toGauss(i: Double) = (i * 15).asInstanceOf[Int] + 1
 

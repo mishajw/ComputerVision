@@ -1,5 +1,6 @@
 package vision.util
 
+import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.{File, FileNotFoundException}
 import java.net.{MalformedURLException, URL}
@@ -14,7 +15,7 @@ import vision.filters.{Filter, FilterFactory}
 
 class ImageWrapper(private val _pixels: Matrix) extends Cloneable with Logging {
 
-	def this(path: String) {
+	def this(path: String, greenElement: Boolean = false) {
 		this({
 			var rgbImage: BufferedImage = null
 
@@ -28,11 +29,24 @@ class ImageWrapper(private val _pixels: Matrix) extends Cloneable with Logging {
 					rgbImage = ImageIO.read(f)
 			}
 
-			val greyImage = new BufferedImage(rgbImage.getWidth, rgbImage.getHeight, BufferedImage.TYPE_BYTE_GRAY)
-			greyImage.getGraphics.drawImage(rgbImage, 0, 0, null)
+			if (greenElement) {
+				val rgbPixels = rgbImage.getRaster.getPixels(0, 0, rgbImage.getWidth, rgbImage.getHeight, null: Array[Double])
+				val greens = (rgbPixels grouped 3).map(e => e(1))
 
-			val greyPixels = greyImage.getRaster.getPixels(0, 0, greyImage.getWidth, greyImage.getHeight, null: Array[Double])
-			new Matrix(greyPixels, greyImage.getWidth, greyImage.getHeight)
+				val singleByteImage = new BufferedImage(rgbImage.getWidth, rgbImage.getHeight, BufferedImage.TYPE_BYTE_GRAY)
+				val singleRaster = singleByteImage.getRaster
+				singleRaster.setPixels(0, 0, rgbImage.getWidth, rgbImage.getHeight, greens.toArray)
+
+				new Matrix(singleRaster.getPixels(0, 0, rgbImage.getWidth, rgbImage.getHeight, null: Array[Double]),
+					rgbImage.getWidth, rgbImage.getHeight)
+			}
+			else {
+				val greyImage = new BufferedImage(rgbImage.getWidth, rgbImage.getHeight, BufferedImage.TYPE_BYTE_GRAY)
+				greyImage.getGraphics.drawImage(rgbImage, 0, 0, null)
+
+				val greyPixels = greyImage.getRaster.getPixels(0, 0, greyImage.getWidth, greyImage.getHeight, null: Array[Double])
+				new Matrix(greyPixels, greyImage.getWidth, greyImage.getHeight)
+			}
 		})
 	}
 
@@ -51,7 +65,7 @@ class ImageWrapper(private val _pixels: Matrix) extends Cloneable with Logging {
 	def createImage = {
 		debug("Creating image to display")
 		val image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY)
-		image.getRaster.setPixels(0, 0, width, height, pixels.array.toArray)
+		image.getRaster.setPixels(0, 0, width, height, pixels.array)
 		image
 	}
 
