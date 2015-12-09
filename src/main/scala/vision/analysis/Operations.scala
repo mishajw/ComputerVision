@@ -13,6 +13,7 @@ object Operations {
 			case Roberts => "RBTS"
 			case Prewitt => "PRWT"
 			case Laplacian => "LPLCN"
+			case NoOperation => "NOP"
 		}
 	}
 
@@ -53,6 +54,8 @@ object Operations {
 
 	case object FlipOperation extends Operation
 
+	case object NoOperation extends Operation
+
 
 	abstract sealed class FilterOperation extends Operation
 
@@ -81,14 +84,15 @@ object Operations {
 
 		// no parameters
 		if (args == null) {
-			name match {
-				case "NormaliseOperation" => return NormaliseOperation
-				case "FlipOperation" => return FlipOperation
-				case "SimpleGradient" => return SimpleGradient
-				case "Sobel" => return Sobel
-				case "Roberts" => return Roberts
-				case "Prewitt" => return Prewitt
-				case "Laplacian" => return Laplacian
+			return name match {
+				case "NormaliseOperation" => NormaliseOperation
+				case "FlipOperation" => FlipOperation
+				case "SimpleGradient" => SimpleGradient
+				case "Sobel" => Sobel
+				case "Roberts" => Roberts
+				case "Prewitt" => Prewitt
+				case "Laplacian" => Laplacian
+				case "NopOperation" => NoOperation
 			}
 		}
 
