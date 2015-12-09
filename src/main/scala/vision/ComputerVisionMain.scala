@@ -5,7 +5,6 @@ import javax.swing._
 import grizzled.slf4j.Logging
 import vision.analysis.Operations._
 import vision.analysis.TestResults
-import vision.filters.FilterFactory
 import vision.util.ImageWrapper
 
 object ComputerVisionMain extends Logging {
@@ -21,9 +20,8 @@ object ComputerVisionMain extends Logging {
 	def main(args: Array[String]): Unit = {
 		info("Starting...")
 
-		println(FilterFactory.getFilter(Gaussian(5, 1)))
-
 //		noiseRemoval()
+//		simpleEdgeDetectionFilterTests()
 	}
 
 	/**
@@ -31,9 +29,7 @@ object ComputerVisionMain extends Logging {
 		*/
 	def noiseRemoval(): Unit = {
 		var results = Seq.empty[(String, TestResults)]
-		for (pair <- thresholds) {
-			val (index, threshold) = pair
-
+		for ((index, threshold) <- thresholds) {
 			val orig = getOriginalImage(index)
 			val sample = getSampleImage(index).flip
 
@@ -48,12 +44,24 @@ object ComputerVisionMain extends Logging {
 			info("With noise removal")
 			info(withRes)
 			results = results :+(images(index) + " with", withRes)
-
-			//			sans.display
-			//			avec.display
 		}
 
-		Analyser.drawResults(results, title = "The effect of noise removal", limit = true, saveFile = "noise_removal_all")
+		Analyser.drawResults(results, title = "The effect of noise removal", limit = true/*, saveFile = "noise_removal_all"*/)
+	}
+
+	def simpleEdgeDetectionFilterTests(): Unit = {
+		for (i <- 0 until 3) {
+			val image = getOriginalImage(i)
+				.applyThreshold(thresholds(i))
+				.apply(Gaussian(5, 1))
+
+			val sample = getSampleImage(i).flip
+
+			val results = for (edf <- EDGE_DETECTORS)
+				yield (edf.toString, image.apply(edf).applyThreshold(10).checkValidity(sample))
+
+			Analyser.drawResults(results, title = "The effects of different Edge Detection filters"/*, saveFile = s"$i-edge_detect_all"*/)
+		}
 	}
 
 	def getOriginalPath(index: Int) = s"$imagesPath/orig/${images(index)}.bmp"
@@ -63,7 +71,6 @@ object ComputerVisionMain extends Logging {
 	def getOriginalImage(index: Int) = new ImageWrapper(getOriginalPath(index))
 
 	def getSampleImage(index: Int) = new ImageWrapper(getSamplePath(index))
-
 
 	def toGauss(i: Double) = (i * 15).asInstanceOf[Int] + 1
 
