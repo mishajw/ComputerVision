@@ -61,19 +61,40 @@ object FilterFactory extends Logging {
 		new Matrix(filter.toArray, width, height)
 	}
 
+	/**
+		* Get a gaussian filter
+		* @param size Size of the filter
+		* @param sd Standard deviation of the Gaussian call
+		* @return Gaussian filter
+		*/
 	def getGaussianImage(size: Int, sd: Double): Matrix = {
+		val k = (size / 2) - 1
 
-		val gaussian = breeze.stats.distributions.Gaussian(0, sd)
-		val step = 2d / size.asInstanceOf[Double]
-		var filter = new ArrayBuffer[Double]()
+		new Matrix((for (x <- 0 until size; y <- 0 until size)
+			yield (1 / (2 * Math.PI * sd * sd)) *
+				Math.exp(
+					-(Math.pow(x - k - 1, 2) + Math.pow(y - k - 1, 2)) / (2 * sd * sd))).toArray,
+		size, size)
 
-		for (x <- -1.0 to (1.0, step); y <- -1.0 to (1.0, step)) {
-			filter = filter :+ gaussian.cdf(x) * gaussian.cdf(y)
-		}
 
-		new Matrix(filter.toArray, size, size)
+
+
+//		val gaussian = breeze.stats.distributions.Gaussian(0, sd)
+//		val step = 2d / size.asInstanceOf[Double]
+//		var filter = new ArrayBuffer[Double]()
+//
+//		for (x <- -1.0 to (1.0, step); y <- -1.0 to (1.0, step)) {
+//			filter = filter :+ gaussian.cdf(x) * gaussian.cdf(y)
+//		}
+//
+//		new Matrix(filter.toArray, size, size)
 	}
 
+	/**
+		* Get a filter for simple smoothing
+		* @param size
+		* @return
+		*/
 	def getMeanFilter(size: Int): Matrix = {
 		new Matrix(Array.fill(size * size)(1 / (size.toDouble * size.toDouble)), size, size)
 	}

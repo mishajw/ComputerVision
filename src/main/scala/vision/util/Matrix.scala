@@ -52,8 +52,10 @@ class Matrix(matrixArray: Array[Double], matrixWidth: Int, matrixHeight: Int) {
 	}
 
 	override def toString: String = {
-    "\n" + array.indices.map(i => f"${array(i).asInstanceOf[Double]}%.3f" + {
-      if (i % height == 0) "]\n[" else ", "
-    }).mkString
+    "\n" + array
+			.grouped(width)
+			.map(_.map(e => f"$e%.3f")
+						.mkString(", "))
+			.mkString("\n")
   }
 }

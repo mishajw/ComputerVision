@@ -21,7 +21,9 @@ object ComputerVisionMain extends Logging {
 	def main(args: Array[String]): Unit = {
 		info("Starting...")
 
-		noiseRemoval()
+		println(FilterFactory.getFilter(Gaussian(5, 1)))
+
+//		noiseRemoval()
 	}
 
 	/**
