@@ -82,7 +82,13 @@ object ComputerVisionMain extends Logging {
 
 	def getSamplePath(index: Int) = s"$imagesPath/sample-edges/${images(index)} Edges.bmp"
 
-	def getOriginalImage(index: Int, greenElement: Boolean = false) = new ImageWrapper(getOriginalPath(index), greenElement)
+	def getOriginalImage(index: Int, greenElement: Boolean = false, threshold: Boolean = true) = {
+		val im = new ImageWrapper(getOriginalPath(index), greenElement)
+		if (threshold)
+			im.apply(ThresholdOperation(thresholds(index)))
+		else
+			im
+	}
 
 	def getSampleImage(index: Int, greenElement: Boolean = false) = new ImageWrapper(getSamplePath(index), greenElement)
 
