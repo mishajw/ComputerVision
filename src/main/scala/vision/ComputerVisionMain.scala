@@ -22,6 +22,7 @@ object ComputerVisionMain extends Logging {
 
 //		noiseRemoval()
 //		simpleEdgeDetectionFilterTests()
+		thresholdExample(0)
 	}
 
 	/**
@@ -62,6 +63,19 @@ object ComputerVisionMain extends Logging {
 
 			Analyser.drawResults(results, title = "The effects of different Edge Detection filters"/*, saveFile = s"$i-edge_detect_all"*/)
 		}
+	}
+
+	def thresholdExample(i: Int): Unit = {
+		val image = getOriginalImage(i)
+			.threshold(thresholds(i))
+			.apply(Gaussian(5, 1))
+			.apply(Roberts)
+
+		val sample = getSampleImage(i).flip
+
+		val results = (1 to 30) map (thr => (thr.toString, image.threshold(thr).doRocAnalysis(sample)))
+
+		Analyser.drawJoinedResults(results, title = "The effects of different final thresholds", saveFile = s"threshold_example")
 	}
 
 	def getOriginalPath(index: Int) = s"$imagesPath/orig/${images(index)}.bmp"

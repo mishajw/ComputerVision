@@ -19,7 +19,7 @@ object Analyser extends Logging {
 		* @return Test results for each operation variation
 		*/
 	def vary(orig: ImageWrapper, sample: ImageWrapper,
-	         operations: Seq[Operation], postOperations: Seq[Operation]): Seq[(Operation, TestResults)] = {
+					 operations: Seq[Operation], postOperations: Seq[Operation]): Seq[(Operation, TestResults)] = {
 
 		var results = Seq.empty[(Operation, TestResults)]
 
@@ -130,6 +130,54 @@ object Analyser extends Logging {
 			exportToCsv(results, s"src/main/resources/csvs/$saveFile.csv")
 		}
 	}
+
+	/**
+		* Graphs the given results
+		*
+		* @param results legend label -> results
+		* @param title Plot title
+		* @param size Size of plot in pixels
+		*/
+	def drawJoinedResults(results: Seq[(String, TestResults)], limit: Boolean = false, title: String = "", size: Int = 800, saveFile: String = null) = {
+
+		val f = Figure(title)
+		val p = f.subplot(0)
+
+		f.width = size
+		f.height = size
+
+		p.xlabel = "FPR (1 - specificity)"
+		p.ylabel = "TPR (sensitivity)"
+		p.setXAxisDecimalTickUnits()
+		p.setYAxisDecimalTickUnits()
+		p.legend = true
+		p.title = title
+
+		if (limit) {
+			p.xlim(0d, 1d)
+			p.ylim(0d, 1d)
+		}
+
+		val x: DenseVector[Double] = DenseVector(results.map(_._2.fpr).toArray)
+		val y: DenseVector[Double] = DenseVector(results.map(_._2.tpr).toArray)
+
+		p += plot(x, y, shapes = true,
+			labels = (i) => results(i)._1,
+			tips = (i) => "Distance from optimal:" + results(i)._2.dist)
+
+		if (saveFile != null) {
+			try {
+				f.saveas(s"src/main/resources/graphs/$saveFile.png")
+				info(s"Saved graph to $saveFile")
+			} catch {
+				case e: Throwable => error(s"Couldn't save file: $e")
+			}
+
+			exportToCsv(results, s"src/main/resources/csvs/$saveFile.csv")
+		}
+	}
+
+
 
 	def exportToCsv(results: Seq[(String, TestResults)], path: String): Unit = {
 		val writer = new PrintWriter(new File(path))
