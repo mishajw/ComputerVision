@@ -16,13 +16,38 @@ object ComputerVisionMain extends Logging {
 
 	val images = Seq("10905 JL", "43590 AM", "9343 AM")
 	val thresholds = Seq(34, 10, 30)
+	val finalThreshold = 15 // reasonable
+
 
 	def main(args: Array[String]): Unit = {
 		info("Starting...")
 
-//		noiseRemoval()
-//		simpleEdgeDetectionFilterTests()
-		thresholdExample(0)
+//		noiseRemovalVariation(Seq(0.5d, 1d, 4d) map (Gaussian(3, _)))
+	}
+
+	def noiseRemovalVariation(noiseRemovalVariations: Seq[NoiseRemoval], edgeDetector: EdgeDetection = Sobel): Unit = {
+
+		images.zipWithIndex foreach (pair => {
+			val (name, i) = pair
+
+			val image = getOriginalImage(i)
+			val sample = getSampleImage(i)
+
+			println(name)
+			noiseRemovalVariations foreach (nr => {
+				print(nr + " -> ")
+				println(image.
+						apply(nr)
+						.apply(edgeDetector)
+						.apply(ThresholdOperation(finalThreshold))
+						.flip
+						.doRocAnalysis(sample))
+			})
+
+
+		})
+
+
 	}
 
 	/**
@@ -65,7 +90,7 @@ object ComputerVisionMain extends Logging {
 		}
 	}
 
-	def thresholdExample(i: Int): Unit = {
+	def thresholdRanges(i: Int): Unit = {
 		val image = getOriginalImage(i)
 			.threshold(thresholds(i))
 			.apply(Gaussian(5, 1))
