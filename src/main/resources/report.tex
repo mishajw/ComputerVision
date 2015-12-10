@@ -99,7 +99,7 @@ We tested all the filters side-by-side using the standard series of operations. 
 
 The use of Laplacian yielded some interesting results. Although it had very precise lines, we found that it tended to perceive cells smaller than the samples. This is why it had worse results in ROC analysis, as ROC analysis doesn’t take into account small transformations. This a major flaw of ROC, and perhaps different methods of verification can be used to evaluate edge detection systems.
 
-With Laplacian, we were able to combine it with Gaussian by convolving the matrices with each other. This lead to the same result, but instead of taking 1614 milliseconds, it took 1088. This is due to only having to perform one large convolution with the combination of the filters, rather than both separately. The reason it isn’t twice as fast is likely due to other overhead factors.
+With Laplacian, we were able to combine it with Gaussian by convolving the matrices with each other. This lead to the same result, but cut the operation time by more than a factor of 3, from 823ms to 226ms. This is due to only having to perform one large convolution with the combination of the filters, rather than both separately.
 \subsubsection*{Final Thresholding}
 
 \begin{figure}[h]
