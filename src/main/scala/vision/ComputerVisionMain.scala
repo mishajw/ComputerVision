@@ -29,7 +29,7 @@ object ComputerVisionMain extends Logging {
 		*/
 	def noiseRemoval(): Unit = {
 		var results = Seq.empty[(String, TestResults)]
-		for ((index, threshold) <- thresholds) {
+		for ((threshold, index) <- thresholds.zipWithIndex) {
 			val orig = getOriginalImage(index)
 			val sample = getSampleImage(index).flip
 
