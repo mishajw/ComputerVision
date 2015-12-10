@@ -1,6 +1,6 @@
 package vision
 
-import java.awt.Dimension
+import java.io.{File, PrintWriter}
 
 import breeze.linalg.DenseVector
 import breeze.plot._
@@ -120,9 +120,22 @@ object Analyser extends Logging {
 		})
 
 		if (saveFile != null) {
-			f.saveas(s"src/main/resources/graphs/$saveFile.png")
-			info(s"Saved graph to $saveFile")
-		}
+			try {
+				f.saveas(s"src/main/resources/graphs/$saveFile.png")
+				info(s"Saved graph to $saveFile")
+			} catch {
+				case e: Throwable => error(s"Couldn't save file: $e")
+			}
 
+			exportToCsv(results, s"src/main/resources/csvs/$saveFile.csv")
+		}
+	}
+
+	def exportToCsv(results: Seq[(String, TestResults)], path: String): Unit = {
+		val writer = new PrintWriter(new File(path))
+		writer.write(
+			Seq("Name", "TPR", "FPR", "Distance from optimal").mkString(",") + "\n" +
+				(results.map(r => Seq(r._1, r._2.tpr, r._2.fpr, r._2.dist) mkString ",") mkString "\n"))
+		writer.close()
 	}
 }
